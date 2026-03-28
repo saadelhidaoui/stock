@@ -1,4 +1,4 @@
-# StockOS — Stock Management Web App
+# IntelStock — Stock Management Web App
 
 ```bash
 # 1. Install dependencies
