@@ -9,6 +9,10 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
     <link rel="stylesheet" href="/static/style.css" />
     <style>
       *,
@@ -60,7 +64,7 @@
           style="width: 100%; justify-content: center"
           onclick="doLogin()"
         >
-          Se connecter →
+          Se connecter <i class="bi bi-box-arrow-in-right"></i>
         </button>
       </div>
     </div>
@@ -71,32 +75,41 @@
         <!-- BARRE LATÉRALE -->
         <nav class="sidebar">
           <div class="sidebar-logo">
-            ⬡ IntelStock<span id="org-name">Plateforme de Stocks</span>
+            <i class="bi bi-box-seam"></i> IntelStock<span id="org-name"
+              >Plateforme de Stocks</span
+            >
           </div>
           <div class="nav">
             <div class="nav-section">Principal</div>
             <div class="nav-item active" onclick="goPage('dashboard')">
-              <span class="nav-icon">◈</span> Tableau de bord
+              <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
+              Tableau de bord
             </div>
             <div class="nav-item" onclick="goPage('products')">
-              <span class="nav-icon">⬚</span> Produits
+              <span class="nav-icon"><i class="bi bi-box-seam"></i></span>
+              Produits
             </div>
             <div class="nav-item" onclick="goPage('movements')">
-              <span class="nav-icon">⇄</span> Mouvements
+              <span class="nav-icon"
+                ><i class="bi bi-arrow-left-right"></i
+              ></span>
+              Mouvements
             </div>
             <div class="nav-section">Opérations</div>
             <div class="nav-item" onclick="goPage('alerts')">
-              <span class="nav-icon">⚡</span> Alertes
+              <span class="nav-icon"><i class="bi bi-bell"></i></span> Alertes
               <span class="nav-badge" id="alert-nav-count" style="display: none"
                 >0</span
               >
             </div>
             <div class="nav-item" onclick="goPage('reports')">
-              <span class="nav-icon">▦</span> Rapports
+              <span class="nav-icon"><i class="bi bi-bar-chart"></i></span>
+              Rapports
             </div>
             <div class="nav-section" id="admin-nav-section">Admin</div>
             <div class="nav-item" id="users-nav-item" onclick="goPage('users')">
-              <span class="nav-icon">⊕</span> Utilisateurs
+              <span class="nav-icon"><i class="bi bi-people"></i></span>
+              Utilisateurs
             </div>
           </div>
           <div class="sidebar-user">
@@ -106,7 +119,7 @@
               <div class="user-role" id="user-role">—</div>
             </div>
             <button class="logout-btn" onclick="doLogout()" title="Déconnexion">
-              ✕
+              <i class="bi bi-box-arrow-right"></i>
             </button>
           </div>
         </nav>
@@ -120,7 +133,9 @@
               id="global-search-wrap"
               style="display: none"
             >
-              <span style="color: var(--subtle); font-size: 13px">⌕</span>
+              <span style="color: var(--subtle); font-size: 13px"
+                ><i class="bi bi-search"></i
+              ></span>
               <input
                 type="text"
                 id="product-search"
@@ -141,7 +156,7 @@
                 onclick="goPage('alerts')"
                 id="alert-bell"
               >
-                🔔
+                <i class="bi bi-bell"></i>
                 <div
                   class="alert-dot"
                   id="alert-dot"
@@ -166,25 +181,31 @@
                   <div class="kpi-label">Total Produits</div>
                   <div class="kpi-val" id="kpi-products">—</div>
                   <div class="kpi-sub">SKU Actifs</div>
-                  <div class="kpi-icon">⬚</div>
+                  <div class="kpi-icon"><i class="bi bi-list-check"></i></div>
                 </div>
                 <div class="kpi-card green">
                   <div class="kpi-label">Valeur du Stock</div>
                   <div class="kpi-val" id="kpi-value">—</div>
                   <div class="kpi-sub">Valeur totale inventaire</div>
-                  <div class="kpi-icon">◈</div>
+                  <div class="kpi-icon">
+                    <i class="bi bi-currency-dollar"></i>
+                  </div>
                 </div>
                 <div class="kpi-card amber">
                   <div class="kpi-label">Stock Faible</div>
                   <div class="kpi-val" id="kpi-low">—</div>
                   <div class="kpi-sub">Nécessite attention</div>
-                  <div class="kpi-icon">⚠</div>
+                  <div class="kpi-icon">
+                    <i class="bi bi-exclamation-triangle"></i>
+                  </div>
                 </div>
                 <div class="kpi-card red">
                   <div class="kpi-label">Alertes Actives</div>
                   <div class="kpi-val" id="kpi-alerts">—</div>
                   <div class="kpi-sub" id="kpi-alerts-sub">—</div>
-                  <div class="kpi-icon">⚡</div>
+                  <div class="kpi-icon">
+                    <i class="bi bi-lightning-charge"></i>
+                  </div>
                 </div>
               </div>
 
@@ -213,7 +234,7 @@
                       class="btn btn-ghost btn-sm"
                       onclick="goPage('alerts')"
                     >
-                      Voir tout →
+                      Voir tout <i class="bi bi-arrow-right"></i>
                     </button>
                   </div>
                   <div id="dash-alerts-list"></div>
