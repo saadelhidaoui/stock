@@ -1,0 +1,1197 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StockOS — Gestion d'Inventaire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ÉCRAN DE CONNEXION -->
+    <div id="login-screen">
+      <div class="login-card">
+        <div class="login-logo">⬡ IntelStock</div>
+        <div class="login-tagline">Plateforme de Gestion des Stocks</div>
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input
+            class="form-input"
+            id="login-email"
+            type="email"
+            value="admin@stock.io"
+            placeholder="vous@entreprise.com"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <input
+            class="form-input"
+            id="login-pass"
+            type="password"
+            value="admin123"
+            placeholder="••••••••"
+          />
+        </div>
+        <div
+          id="login-err"
+          style="
+            color: var(--red);
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: none;
+          "
+        ></div>
+        <button
+          class="btn btn-primary"
+          style="width: 100%; justify-content: center"
+          onclick="doLogin()"
+        >
+          Se connecter →
+        </button>
+      </div>
+    </div>
+
+    <!-- APPLICATION PRINCIPALE -->
+    <div id="app">
+      <div class="shell">
+        <!-- BARRE LATÉRALE -->
+        <nav class="sidebar">
+          <div class="sidebar-logo">
+            ⬡ IntelStock<span id="org-name">Plateforme de Stocks</span>
+          </div>
+          <div class="nav">
+            <div class="nav-section">Principal</div>
+            <div class="nav-item active" onclick="goPage('dashboard')">
+              <span class="nav-icon">◈</span> Tableau de bord
+            </div>
+            <div class="nav-item" onclick="goPage('products')">
+              <span class="nav-icon">⬚</span> Produits
+            </div>
+            <div class="nav-item" onclick="goPage('movements')">
+              <span class="nav-icon">⇄</span> Mouvements
+            </div>
+            <div class="nav-section">Opérations</div>
+            <div class="nav-item" onclick="goPage('alerts')">
+              <span class="nav-icon">⚡</span> Alertes
+              <span class="nav-badge" id="alert-nav-count" style="display: none"
+                >0</span
+              >
+            </div>
+            <div class="nav-item" onclick="goPage('reports')">
+              <span class="nav-icon">▦</span> Rapports
+            </div>
+            <div class="nav-section" id="admin-nav-section">Admin</div>
+            <div class="nav-item" id="users-nav-item" onclick="goPage('users')">
+              <span class="nav-icon">⊕</span> Utilisateurs
+            </div>
+          </div>
+          <div class="sidebar-user">
+            <div class="user-avatar" id="user-avatar">SA</div>
+            <div>
+              <div class="user-name" id="user-name">Chargement...</div>
+              <div class="user-role" id="user-role">—</div>
+            </div>
+            <button class="logout-btn" onclick="doLogout()" title="Déconnexion">
+              ✕
+            </button>
+          </div>
+        </nav>
+
+        <!-- CONTENU PRINCIPAL -->
+        <div class="main">
+          <div class="topbar">
+            <div class="page-title" id="topbar-title">Tableau de bord</div>
+            <div
+              class="topbar-search"
+              id="global-search-wrap"
+              style="display: none"
+            >
+              <span style="color: var(--subtle); font-size: 13px">⌕</span>
+              <input
+                type="text"
+                id="product-search"
+                placeholder="Rechercher produits, SKU..."
+                oninput="searchProducts()"
+              />
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 8px;
+                margin-left: auto;
+                align-items: center;
+              "
+            >
+              <div
+                class="alert-bell"
+                onclick="goPage('alerts')"
+                id="alert-bell"
+              >
+                🔔
+                <div
+                  class="alert-dot"
+                  id="alert-dot"
+                  style="display: none"
+                ></div>
+              </div>
+              <button
+                class="btn btn-primary btn-sm"
+                id="topbar-action"
+                onclick="openAddProduct()"
+              >
+                + Ajouter Produit
+              </button>
+            </div>
+          </div>
+
+          <div class="content">
+            <!-- PAGE TABLEAU DE BORD -->
+            <div class="page active" id="page-dashboard">
+              <div class="kpi-grid">
+                <div class="kpi-card blue">
+                  <div class="kpi-label">Total Produits</div>
+                  <div class="kpi-val" id="kpi-products">—</div>
+                  <div class="kpi-sub">SKU Actifs</div>
+                  <div class="kpi-icon">⬚</div>
+                </div>
+                <div class="kpi-card green">
+                  <div class="kpi-label">Valeur du Stock</div>
+                  <div class="kpi-val" id="kpi-value">—</div>
+                  <div class="kpi-sub">Valeur totale inventaire</div>
+                  <div class="kpi-icon">◈</div>
+                </div>
+                <div class="kpi-card amber">
+                  <div class="kpi-label">Stock Faible</div>
+                  <div class="kpi-val" id="kpi-low">—</div>
+                  <div class="kpi-sub">Nécessite attention</div>
+                  <div class="kpi-icon">⚠</div>
+                </div>
+                <div class="kpi-card red">
+                  <div class="kpi-label">Alertes Actives</div>
+                  <div class="kpi-val" id="kpi-alerts">—</div>
+                  <div class="kpi-sub" id="kpi-alerts-sub">—</div>
+                  <div class="kpi-icon">⚡</div>
+                </div>
+              </div>
+
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 16px;
+                  margin-bottom: 24px;
+                "
+              >
+                <div class="table-wrap" style="padding: 18px">
+                  <div class="section-header" style="margin-bottom: 10px">
+                    <div class="section-title">Activité (7 jours)</div>
+                    <span style="font-size: 11px; color: var(--muted)"
+                      >Mouvements de stock</span
+                    >
+                  </div>
+                  <div class="trend-chart" id="trend-chart"></div>
+                  <div class="trend-labels" id="trend-labels"></div>
+                </div>
+                <div class="table-wrap" style="padding: 18px">
+                  <div class="section-header" style="margin-bottom: 14px">
+                    <div class="section-title">Alertes Critiques</div>
+                    <button
+                      class="btn btn-ghost btn-sm"
+                      onclick="goPage('alerts')"
+                    >
+                      Voir tout →
+                    </button>
+                  </div>
+                  <div id="dash-alerts-list"></div>
+                </div>
+              </div>
+
+              <div class="section-header">
+                <div class="section-title">Mouvements Récents</div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Produit</th>
+                      <th>Qté</th>
+                      <th>Référence</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dash-movements"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- PAGE PRODUITS -->
+            <div class="page" id="page-products">
+              <div class="table-wrap">
+                <div class="table-toolbar">
+                  <div class="filter-row" id="cat-filters">
+                    <div
+                      class="filter-chip active"
+                      onclick="filterCat(0, this)"
+                    >
+                      Tous
+                    </div>
+                  </div>
+                  <div style="margin-left: auto; display: flex; gap: 8px">
+                    <select
+                      class="form-input"
+                      style="width: auto; padding: 6px 10px"
+                      id="status-filter"
+                      onchange="filterStatus()"
+                    >
+                      <option value="">Tous les statuts</option>
+                      <option value="critical">Critique</option>
+                      <option value="warning">Attention</option>
+                      <option value="ok">OK</option>
+                    </select>
+                  </div>
+                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>SKU</th>
+                      <th>Produit</th>
+                      <th>Catégorie</th>
+                      <th>Stock</th>
+                      <th>Statut</th>
+                      <th>Valeur</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="products-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- PAGE MOUVEMENTS -->
+            <div class="page" id="page-movements">
+              <div class="section-header">
+                <div class="section-title">Mouvements de Stock</div>
+                <button class="btn btn-primary" onclick="openMoveModal()">
+                  + Nouveau Mouvement
+                </button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Produit</th>
+                      <th>SKU</th>
+                      <th>Quantité</th>
+                      <th>Référence</th>
+                      <th>Notes</th>
+                      <th>Par</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="movements-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- PAGE ALERTES -->
+            <div class="page" id="page-alerts">
+              <div class="section-header">
+                <div class="section-title">Centre d'Alerte</div>
+                <div style="display: flex; gap: 8px">
+                  <div
+                    class="filter-chip active"
+                    onclick="filterAlerts('all', this)"
+                  >
+                    Tous
+                  </div>
+                  <div
+                    class="filter-chip"
+                    onclick="filterAlerts('critical', this)"
+                  >
+                    Critique
+                  </div>
+                  <div
+                    class="filter-chip"
+                    onclick="filterAlerts('warning', this)"
+                  >
+                    Attention
+                  </div>
+                  <div class="filter-chip" onclick="filterAlerts('info', this)">
+                    Info
+                  </div>
+                </div>
+              </div>
+              <div id="alerts-list"></div>
+            </div>
+
+            <!-- PAGE RAPPORTS -->
+            <div class="page" id="page-reports">
+              <div class="kpi-grid" style="margin-bottom: 20px">
+                <div class="kpi-card blue">
+                  <div class="kpi-label">Catégorie A</div>
+                  <div id="rpt-a" class="kpi-val" style="font-size: 22px">
+                    —
+                  </div>
+                  <div class="kpi-sub">70% de la valeur du stock</div>
+                </div>
+                <div class="kpi-card green">
+                  <div class="kpi-label">Catégorie B</div>
+                  <div id="rpt-b" class="kpi-val" style="font-size: 22px">
+                    —
+                  </div>
+                  <div class="kpi-sub">20% de la valeur du stock</div>
+                </div>
+                <div class="kpi-card amber">
+                  <div class="kpi-label">Catégorie C</div>
+                  <div id="rpt-c" class="kpi-val" style="font-size: 22px">
+                    —
+                  </div>
+                  <div class="kpi-sub">10% de la valeur du stock</div>
+                </div>
+                <div class="kpi-card red">
+                  <div class="kpi-label">Stock Zéro</div>
+                  <div id="rpt-zero" class="kpi-val" style="font-size: 22px">
+                    —
+                  </div>
+                  <div class="kpi-sub">Articles en rupture</div>
+                </div>
+              </div>
+              <div class="report-grid">
+                <div class="table-wrap" style="padding: 18px">
+                  <div class="section-title" style="margin-bottom: 14px">
+                    Valeur par Catégorie
+                  </div>
+                  <div class="bar-chart" id="cat-chart"></div>
+                </div>
+                <div class="table-wrap" style="padding: 18px">
+                  <div class="section-title" style="margin-bottom: 14px">
+                    Analyse ABC — Meilleurs Articles
+                  </div>
+                  <div id="abc-table"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PAGE UTILISATEURS -->
+            <div class="page" id="page-users">
+              <div class="section-header">
+                <div class="section-title">Gestion des Utilisateurs</div>
+                <button class="btn btn-primary" onclick="openAddUser()">
+                  + Inviter Utilisateur
+                </button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Utilisateur</th>
+                      <th>E-mail</th>
+                      <th>Rôle</th>
+                      <th>Statut</th>
+                      <th>Inscrit le</th>
+                      <th>Dernière Connexion</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="users-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODALES -->
+    <div class="modal-overlay" id="product-modal">
+      <div class="modal">
+        <div class="modal-title">Ajouter un Produit</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">SKU *</label
+            ><input class="form-input" id="p-sku" placeholder="PRD-001" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Unité</label
+            ><input
+              class="form-input"
+              id="p-unit"
+              placeholder="pièces"
+              value="pièces"
+            />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nom du Produit *</label
+          ><input class="form-input" id="p-name" placeholder="Nom du produit" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catégorie</label>
+          <select class="form-input" id="p-cat"></select>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Point de Réapprovisionnement</label
+            ><input class="form-input" id="p-rp" type="number" value="10" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantité de Réapprovisionnement</label
+            ><input class="form-input" id="p-rq" type="number" value="50" />
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Coût Unitaire ($)</label
+            ><input
+              class="form-input"
+              id="p-cost"
+              type="number"
+              step="0.01"
+              value="0"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stock Initial</label
+            ><input class="form-input" id="p-qty" type="number" value="0" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('product-modal')">
+            Annuler
+          </button>
+          <button class="btn btn-primary" onclick="submitAddProduct()">
+            Ajouter Produit
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="move-modal">
+      <div class="modal">
+        <div class="modal-title">Nouveau Mouvement de Stock</div>
+        <div class="form-group">
+          <label class="form-label">Type de Mouvement</label>
+          <select class="form-input" id="m-type">
+            <option value="receive">📥 Réception Stock</option>
+            <option value="transfer">📤 Transfert / Expédition</option>
+            <option value="writeoff">🗑 Mise au Rebut</option>
+            <option value="adjust">✏ Ajustement Manuel</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Produit *</label>
+          <select class="form-input" id="m-product"></select>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Quantité *</label
+            ><input
+              class="form-input"
+              id="m-qty"
+              type="number"
+              min="1"
+              value="1"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">N° de Référence</label
+            ><input
+              class="form-input"
+              id="m-ref"
+              placeholder="BC-001, REF-123..."
+            />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label
+          ><input
+            class="form-input"
+            id="m-notes"
+            placeholder="Notes optionnelles"
+          />
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('move-modal')">
+            Annuler
+          </button>
+          <button class="btn btn-primary" onclick="submitMove()">
+            Enregistrer Mouvement
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="user-modal">
+      <div class="modal">
+        <div class="modal-title">Inviter un Utilisateur</div>
+        <div class="form-group">
+          <label class="form-label">Nom Complet *</label
+          ><input class="form-input" id="u-name" placeholder="Jean Dupont" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-mail *</label
+          ><input
+            class="form-input"
+            id="u-email"
+            type="email"
+            placeholder="jean@entreprise.com"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mot de passe *</label
+          ><input
+            class="form-input"
+            id="u-pass"
+            type="password"
+            placeholder="Mot de passe temporaire"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rôle</label>
+          <select class="form-input" id="u-role">
+            <option value="viewer">Visionneur</option>
+            <option value="operator">Opérateur</option>
+            <option value="admin">Administrateur</option>
+            <option value="superadmin">Super Administrateur</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('user-modal')">
+            Annuler
+          </button>
+          <button class="btn btn-primary" onclick="submitAddUser()">
+            Inviter Utilisateur
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      let currentUser = null;
+      let allProducts = [];
+      let allAlerts = [];
+      let catFilter = 0;
+      let statusFilter = "";
+      let alertFilter = "all";
+
+      // ── Authentification ──────────────────────────────────────────────────────────
+
+      async function doLogin() {
+        const email = document.getElementById("login-email").value;
+        const pass = document.getElementById("login-pass").value;
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password: pass }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentUser = data.user;
+          showApp();
+        } else {
+          document.getElementById("login-err").style.display = "block";
+          document.getElementById("login-err").textContent =
+            data.error || "Échec de connexion";
+        }
+      }
+
+      async function doLogout() {
+        await fetch("/api/auth/logout", { method: "POST" });
+        document.getElementById("app").style.display = "none";
+        document.getElementById("login-screen").style.display = "flex";
+      }
+
+      async function showApp() {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        document.getElementById("user-name").textContent = currentUser.name;
+        document.getElementById("user-role").textContent = currentUser.role;
+        document.getElementById("user-avatar").textContent = currentUser.name
+          .split(" ")
+          .map((w) => w[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase();
+        if (!["superadmin", "admin"].includes(currentUser.role)) {
+          document.getElementById("admin-nav-section").style.display = "none";
+          document.getElementById("users-nav-item").style.display = "none";
+        }
+        loadDashboard();
+        loadCategories();
+      }
+
+      // ── Navigation ─────────────────────────────────────────────────────────────────
+
+      const pageTitles = {
+        dashboard: "Tableau de bord",
+        products: "Produits",
+        movements: "Mouvements de Stock",
+        alerts: "Centre d'Alerte",
+        reports: "Rapports & Analyses",
+        users: "Gestion des Utilisateurs",
+      };
+
+      function goPage(name) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        document.getElementById("page-" + name).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach((n) => {
+          if (
+            n.textContent
+              .toLowerCase()
+              .includes(name.split("-")[0].toLowerCase())
+          )
+            n.classList.add("active");
+        });
+        document.getElementById("topbar-title").textContent =
+          pageTitles[name] || name;
+        document.getElementById("global-search-wrap").style.display =
+          name === "products" ? "flex" : "none";
+        const act = document.getElementById("topbar-action");
+        if (name === "products") {
+          act.style.display = "flex";
+          act.textContent = "+ Ajouter Produit";
+          act.onclick = openAddProduct;
+        } else if (name === "movements") {
+          act.style.display = "flex";
+          act.textContent = "+ Nouveau Mouvement";
+          act.onclick = openMoveModal;
+        } else if (name === "users") {
+          act.style.display = "flex";
+          act.textContent = "+ Inviter Utilisateur";
+          act.onclick = openAddUser;
+        } else act.style.display = "none";
+        if (name === "products") loadProducts();
+        if (name === "movements") loadMovements();
+        if (name === "alerts") loadAlerts();
+        if (name === "reports") loadReports();
+        if (name === "users") loadUsers();
+      }
+
+      // ── Tableau de bord ───────────────────────────────────────────────────────────
+
+      async function loadDashboard() {
+        const d = await api("/api/dashboard");
+        document.getElementById("kpi-products").textContent = d.total_products;
+        document.getElementById("kpi-value").textContent =
+          "$" + d.total_value.toLocaleString();
+        document.getElementById("kpi-low").textContent = d.low_stock;
+        document.getElementById("kpi-alerts").textContent = d.active_alerts;
+        document.getElementById("kpi-alerts-sub").textContent =
+          `${d.critical} critiques · ${d.warning} attentions`;
+
+        if (d.active_alerts > 0) {
+          document.getElementById("alert-dot").style.display = "block";
+          const badge = document.getElementById("alert-nav-count");
+          badge.style.display = "inline";
+          badge.textContent = d.active_alerts;
+        }
+
+        const maxCount = Math.max(...d.trend.map((t) => t.count), 1);
+        const trendEl = document.getElementById("trend-chart");
+        const labelsEl = document.getElementById("trend-labels");
+        trendEl.innerHTML = d.trend
+          .map(
+            (t) =>
+              `<div class="trend-bar" style="height:${Math.max(8, (t.count / maxCount) * 100)}%" title="${t.count} mouvements"></div>`,
+          )
+          .join("");
+        labelsEl.innerHTML = d.trend
+          .map((t) => `<div class="trend-label">${t.day}</div>`)
+          .join("");
+
+        const alertsEl = document.getElementById("dash-alerts-list");
+        const alerts = await api("/api/alerts");
+        allAlerts = alerts;
+        const criticals = alerts
+          .filter((a) => a.level === "critical")
+          .slice(0, 3);
+        if (criticals.length === 0) {
+          alertsEl.innerHTML =
+            '<div class="empty"><div class="empty-icon">✓</div><div class="empty-text">Aucune alerte critique</div></div>';
+        } else {
+          alertsEl.innerHTML = criticals
+            .map(
+              (a) => `
+      <div class="alert-card ${a.level}" style="margin-bottom:8px">
+        <div class="alert-icon-wrap">🚨</div>
+        <div class="alert-content">
+          <div class="alert-title">${a.product}</div>
+          <div class="alert-msg">${a.message}</div>
+          <div class="alert-meta">${a.time}</div>
+        </div>
+      </div>`,
+            )
+            .join("");
+        }
+
+        const mvEl = document.getElementById("dash-movements");
+        mvEl.innerHTML = d.recent_movements
+          .map(
+            (m) => `
+     <tr>
+       <td><span class="badge badge-${m.type}">${m.type}</span></td>
+       <td>${m.product}</td>
+      <td class="mono">×${m.qty}</td>
+      <td class="mono">${m.ref || "—"}</td>
+      <td style="color:var(--muted);font-size:12px">${m.time}</td>
+     </tr>`,
+          )
+          .join("");
+      }
+
+      // ── Produits ──────────────────────────────────────────────────────────────────
+
+      async function loadProducts() {
+        const q = document.getElementById("product-search").value;
+        allProducts = await api(
+          `/api/products?q=${encodeURIComponent(q)}&cat=${catFilter}`,
+        );
+        renderProducts();
+      }
+
+      function renderProducts() {
+        let data = allProducts;
+        if (statusFilter) data = data.filter((p) => p.status === statusFilter);
+        const tbody = document.getElementById("products-tbody");
+        if (!data.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="7"><div class="empty"><div class="empty-icon">⬚</div><div class="empty-text">Aucun produit trouvé</div></div></tr>';
+          return;
+        }
+        tbody.innerHTML = data
+          .map((p) => {
+            const pct = Math.min(
+              100,
+              Math.round((p.quantity / (p.reorder_point * 3)) * 100),
+            );
+            const fillColor =
+              p.status === "ok"
+                ? "var(--green)"
+                : p.status === "warning"
+                  ? "var(--amber)"
+                  : p.status === "low"
+                    ? "var(--purple)"
+                    : "var(--red)";
+            const qtyClass =
+              "qty-" + (p.quantity === 0 ? "critical" : p.status);
+            const canEdit = ["superadmin", "admin", "operator"].includes(
+              currentUser.role,
+            );
+            return `<tr>
+      <td class="mono">${p.sku}</td>
+      <td><div style="font-weight:500">${p.name}</div><div style="font-size:11px;color:var(--muted)">${p.unit}</div></td>
+      <td><span class="cat-badge cat-${p.cat_color}">${p.category}</span></td>
+      <td>
+        <div class="stock-indicator">
+          <span class="${qtyClass}" style="font-weight:500;font-family:var(--font-mono);min-width:30px">${p.quantity}</span>
+          <div class="stock-bar"><div class="stock-fill" style="width:${pct}%;background:${fillColor}"></div></div>
+        </div>
+        <div style="font-size:10px;color:var(--subtle);margin-top:2px">Réapprovisionnement à ${p.reorder_point}</div>
+      </td>
+      <td><span class="badge badge-${p.status}">${p.status === "critical" ? "Critique" : p.status === "warning" ? "Attention" : p.status === "low" ? "Faible" : "OK"}</span></td>
+      <td class="mono">$${p.value.toLocaleString()}</td>
+      <td>
+        <div class="action-row">
+          ${canEdit ? `<button class="btn btn-ghost btn-sm btn-icon" onclick="quickMove(${p.id},'${p.name}')" title="Ajouter stock">+</button>` : ""}
+          ${currentUser.role === "superadmin" ? `<button class="btn btn-danger btn-sm btn-icon" onclick="deleteProduct(${p.id})" title="Supprimer">✕</button>` : ""}
+        </div>
+      </td>
+     </tr>`;
+          })
+          .join("");
+      }
+
+      function searchProducts() {
+        loadProducts();
+      }
+      function filterStatus() {
+        statusFilter = document.getElementById("status-filter").value;
+        renderProducts();
+      }
+
+      async function filterCat(catId, el) {
+        catFilter = catId;
+        document
+          .querySelectorAll("#cat-filters .filter-chip")
+          .forEach((c) => c.classList.remove("active"));
+        el.classList.add("active");
+        await loadProducts();
+      }
+
+      async function loadCategories() {
+        const cats = await api("/api/categories");
+        const filter = document.getElementById("cat-filters");
+        cats.forEach((c) => {
+          const chip = document.createElement("div");
+          chip.className = "filter-chip";
+          chip.textContent = c.name;
+          chip.onclick = () => filterCat(c.id, chip);
+          filter.appendChild(chip);
+        });
+        const pCat = document.getElementById("p-cat");
+        pCat.innerHTML =
+          '<option value="">— Sélectionner une Catégorie —</option>' +
+          cats
+            .map((c) => `<option value="${c.id}">${c.name}</option>`)
+            .join("");
+      }
+
+      async function loadProductsSelect() {
+        const products = await api("/api/products");
+        const sel = document.getElementById("m-product");
+        sel.innerHTML = products
+          .map(
+            (p) =>
+              `<option value="${p.id}">${p.name} (${p.sku}) — Stock: ${p.quantity}</option>`,
+          )
+          .join("");
+      }
+
+      function quickMove(pid, name) {
+        openMoveModal();
+        setTimeout(() => {
+          const sel = document.getElementById("m-product");
+          for (let o of sel.options)
+            if (o.value == pid) {
+              o.selected = true;
+              break;
+            }
+        }, 100);
+      }
+
+      async function deleteProduct(pid) {
+        if (!confirm("Supprimer ce produit et toutes ses données ?")) return;
+        await api(`/api/products/${pid}`, "DELETE");
+        toast("Produit supprimé", "success");
+        loadProducts();
+      }
+
+      // ── Mouvements ─────────────────────────────────────────────────────────────────
+
+      async function loadMovements() {
+        const mvs = await api("/api/movements");
+        const tbody = document.getElementById("movements-tbody");
+        if (!mvs.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="8"><div class="empty"><div class="empty-icon">⇄</div><div class="empty-text">Aucun mouvement</div></div></tr>';
+          return;
+        }
+        tbody.innerHTML = mvs
+          .map(
+            (m) => `<tr>
+     <td><span class="badge badge-${m.type}">${m.type === "receive" ? "Réception" : m.type === "transfer" ? "Transfert" : m.type === "writeoff" ? "Mise au rebut" : "Ajustement"}</span></td>
+     <td>${m.product}</td>
+    <td class="mono">${m.sku}</td>
+    <td class="mono" style="font-weight:500">×${m.quantity}</td>
+    <td class="mono">${m.reference || "—"}</td>
+    <td style="color:var(--muted);font-size:12px">${m.notes || "—"}</td>
+    <td>${m.user}</td>
+    <td style="color:var(--muted);font-size:12px">${m.time}</td>
+   </tr>`,
+          )
+          .join("");
+      }
+
+      // ── Alertes ────────────────────────────────────────────────────────────────────
+
+      async function loadAlerts() {
+        allAlerts = await api("/api/alerts");
+        renderAlerts();
+      }
+
+      function renderAlerts() {
+        const filtered =
+          alertFilter === "all"
+            ? allAlerts
+            : allAlerts.filter((a) => a.level === alertFilter);
+        const el = document.getElementById("alerts-list");
+        if (!filtered.length) {
+          el.innerHTML =
+            '<div class="empty"><div class="empty-icon">✓</div><div class="empty-text">Aucune alerte</div><div class="empty-sub">Tous les niveaux de stock sont sains</div></div>';
+          return;
+        }
+        const icons = { critical: "🚨", warning: "⚠️", info: "ℹ️" };
+        el.innerHTML = filtered
+          .map(
+            (a) => `
+    <div class="alert-card ${a.level}" id="alert-${a.id}">
+      <div class="alert-icon-wrap">${icons[a.level] || "🔔"}</div>
+      <div class="alert-content">
+        <div class="alert-title">${a.product}</div>
+        <div class="alert-msg">${a.message}</div>
+        <div class="alert-meta">${a.time} · ${a.quantity} unités restantes</div>
+      </div>
+      <div class="alert-actions">
+        <button class="btn btn-ghost btn-sm" onclick="resolveAlert(${a.id})">Résoudre</button>
+        <button class="btn btn-primary btn-sm" onclick="openMoveModal()">+ Stock</button>
+      </div>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function filterAlerts(level, el) {
+        alertFilter = level;
+        document
+          .querySelectorAll("#page-alerts .filter-chip")
+          .forEach((c) => c.classList.remove("active"));
+        el.classList.add("active");
+        renderAlerts();
+      }
+
+      async function resolveAlert(id) {
+        await api(`/api/alerts/${id}/resolve`, "POST");
+        toast("Alerte résolue", "success");
+        loadAlerts();
+      }
+
+      // ── Rapports ───────────────────────────────────────────────────────────────────
+
+      async function loadReports() {
+        const data = await api("/api/reports/summary");
+        const abc = data.abc;
+        const aCount = abc.filter((x) => x.abc === "A").length;
+        const bCount = abc.filter((x) => x.abc === "B").length;
+        const cCount = abc.filter((x) => x.abc === "C").length;
+        document.getElementById("rpt-a").textContent = aCount;
+        document.getElementById("rpt-b").textContent = bCount;
+        document.getElementById("rpt-c").textContent = cCount;
+        const allProds = await api("/api/products");
+        document.getElementById("rpt-zero").textContent = allProds.filter(
+          (p) => p.quantity === 0,
+        ).length;
+
+        const cats = data.by_category;
+        const maxVal = Math.max(...Object.values(cats).map((c) => c.value), 1);
+        const colors = ["#4f8ef7", "#a78bfa", "#3fcf7a", "#f5a623", "#2dd4bf"];
+        document.getElementById("cat-chart").innerHTML = Object.entries(cats)
+          .map(
+            ([name, d], i) => `
+    <div class="bar-row">
+      <div class="bar-name">${name}</div>
+      <div class="bar-outer"><div class="bar-inner" style="width:${(d.value / maxVal) * 100}%;background:${colors[i % colors.length]}"></div></div>
+      <div class="bar-val">$${d.value.toFixed(0)}</div>
+    </div>`,
+          )
+          .join("");
+
+        const abcColors = {
+          A: "var(--green)",
+          B: "var(--amber)",
+          C: "var(--red)",
+        };
+        document.getElementById("abc-table").innerHTML = `
+    <table style="width:100%">
+      <thead><tr><th>Produit</th><th>Valeur</th><th>Classe</th> </thead>
+      <tbody>${abc
+        .slice(0, 12)
+        .map(
+          (x) => `</td>
+        <td style="font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.name}</td>
+        <td class="mono">$${x.value}</td>
+        <td><span style="font-weight:600;color:${abcColors[x.abc]}">${x.abc}</span></td>
+      </tr>`,
+        )
+        .join("")}</tbody>
+     </table>`;
+      }
+
+      // ── Utilisateurs ───────────────────────────────────────────────────────────────
+
+      async function loadUsers() {
+        const users = await api("/api/users");
+        const tbody = document.getElementById("users-tbody");
+        tbody.innerHTML = users
+          .map(
+            (u) => ` <tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+      <div style="width:28px;height:28px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff">
+        ${u.name
+          .split(" ")
+          .map((w) => w[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase()}
+      </div>
+      <span style="font-weight:500">${u.name}</span>
+    </div></td>
+    <td class="mono" style="font-size:12px">${u.email}</td>
+    <td><span class="badge badge-${u.role}">${u.role === "superadmin" ? "Super Admin" : u.role === "admin" ? "Admin" : u.role === "operator" ? "Opérateur" : "Visionneur"}</span></td>
+    <td><span style="color:${u.active ? "var(--green)" : "var(--red)"}">⬤</span> ${u.active ? "Actif" : "Inactif"}</td>
+    <td style="color:var(--muted);font-size:12px">${u.created_at}</td>
+    <td style="color:var(--muted);font-size:12px">${u.last_login}</td>
+    <td>${
+      u.id !== currentUser.id && currentUser.role === "superadmin"
+        ? `<button class="btn btn-ghost btn-sm" onclick="toggleUser(${u.id})">${u.active ? "Désactiver" : "Activer"}</button>`
+        : "—"
+    }</td>
+    </tr>`,
+          )
+          .join("");
+      }
+
+      async function toggleUser(id) {
+        await api(`/api/users/${id}/toggle`, "POST");
+        toast("Statut utilisateur mis à jour", "success");
+        loadUsers();
+      }
+
+      // ── Modales ───────────────────────────────────────────────────────────────────
+
+      function openAddProduct() {
+        document.getElementById("product-modal").classList.add("open");
+      }
+      async function openMoveModal() {
+        await loadProductsSelect();
+        document.getElementById("move-modal").classList.add("open");
+        goPage("movements");
+      }
+      function openAddUser() {
+        document.getElementById("user-modal").classList.add("open");
+      }
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("open");
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape")
+          document
+            .querySelectorAll(".modal-overlay.open")
+            .forEach((m) => m.classList.remove("open"));
+      });
+      document.querySelectorAll &&
+        document.addEventListener("DOMContentLoaded", () => {
+          document.querySelectorAll(".modal-overlay").forEach((m) =>
+            m.addEventListener("click", (e) => {
+              if (e.target === m) m.classList.remove("open");
+            }),
+          );
+        });
+
+      async function submitAddProduct() {
+        const data = {
+          sku: document.getElementById("p-sku").value,
+          name: document.getElementById("p-name").value,
+          category_id: document.getElementById("p-cat").value,
+          unit: document.getElementById("p-unit").value,
+          reorder_point: document.getElementById("p-rp").value,
+          reorder_qty: document.getElementById("p-rq").value,
+          unit_cost: document.getElementById("p-cost").value,
+          initial_qty: document.getElementById("p-qty").value,
+        };
+        if (!data.sku || !data.name) {
+          toast("SKU et Nom sont requis", "error");
+          return;
+        }
+        const res = await api("/api/products", "POST", data);
+        if (res.success) {
+          closeModal("product-modal");
+          toast("Produit ajouté !", "success");
+          loadProducts();
+        } else toast(res.error || "Échec", "error");
+      }
+
+      async function submitMove() {
+        const data = {
+          type: document.getElementById("m-type").value,
+          product_id: document.getElementById("m-product").value,
+          quantity: document.getElementById("m-qty").value,
+          reference: document.getElementById("m-ref").value,
+          notes: document.getElementById("m-notes").value,
+        };
+        if (!data.product_id || !data.quantity) {
+          toast("Sélectionnez un produit et une quantité", "error");
+          return;
+        }
+        const res = await api("/api/stock/move", "POST", data);
+        if (res.success) {
+          closeModal("move-modal");
+          toast(
+            `Mouvement enregistré. Nouveau stock: ${res.new_qty}`,
+            "success",
+          );
+          loadMovements();
+        } else toast(res.error || "Échec", "error");
+      }
+
+      async function submitAddUser() {
+        const data = {
+          name: document.getElementById("u-name").value,
+          email: document.getElementById("u-email").value,
+          password: document.getElementById("u-pass").value,
+          role: document.getElementById("u-role").value,
+        };
+        if (!data.name || !data.email || !data.password) {
+          toast("Tous les champs sont requis", "error");
+          return;
+        }
+        const res = await api("/api/users", "POST", data);
+        if (res.success) {
+          closeModal("user-modal");
+          toast("Utilisateur invité !", "success");
+          loadUsers();
+        } else toast(res.error || "Échec", "error");
+      }
+
+      // ── Utilitaires ───────────────────────────────────────────────────────────────
+
+      async function api(url, method = "GET", body = null) {
+        const opts = {
+          method,
+          headers: { "Content-Type": "application/json" },
+        };
+        if (body) opts.body = JSON.stringify(body);
+        const res = await fetch(url, opts);
+        return res.json();
+      }
+
+      function toast(msg, type = "success") {
+        const t = document.getElementById("toast");
+        t.textContent = (type === "success" ? "✓ " : "✕ ") + msg;
+        t.className = `toast ${type} show`;
+        setTimeout(() => t.classList.remove("show"), 3000);
+      }
+
+      // ── Initialisation ───────────────────────────────────────────────────────────
+
+      (async () => {
+        const me = await fetch("/api/auth/me").then((r) => r.json());
+        if (me.id) {
+          currentUser = me;
+          showApp();
+        } else {
+          document.getElementById("login-screen").style.display = "flex";
+          document
+            .getElementById("login-email")
+            .addEventListener("keydown", (e) => e.key === "Enter" && doLogin());
+          document
+            .getElementById("login-pass")
+            .addEventListener("keydown", (e) => e.key === "Enter" && doLogin());
+        }
+      })();
+    </script>
+  </body>
+</html>
