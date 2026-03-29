@@ -2,33 +2,28 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StockOS — Gestion d'Inventaire</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
+    <title>IntelStock — Gestion d'Inventaire</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
     />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="/static/style.css" />
-    <style>
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
   </head>
   <body>
-    <!-- ÉCRAN DE CONNEXION -->
+    <!-- LOGIN -->
     <div id="login-screen">
       <div class="login-card">
-        <div class="login-logo">⬡ IntelStock</div>
+        <div class="login-logo"><i class="bi bi-boxes"></i> IntelStock</div>
         <div class="login-tagline">Plateforme de Gestion des Stocks</div>
         <div class="form-group">
           <label class="form-label">E-mail</label>
@@ -66,55 +61,111 @@
         >
           Se connecter <i class="bi bi-box-arrow-in-right"></i>
         </button>
+        <div
+          style="
+            margin-top: 16px;
+            font-size: 11px;
+            color: var(--subtle);
+            line-height: 1.8;
+          "
+        >
+          admin@stock.io · jane@stock.io · bob@stock.io · alice@stock.io<br />Mot
+          de passe: admin123
+        </div>
       </div>
     </div>
 
-    <!-- APPLICATION PRINCIPALE -->
+    <!-- APP -->
     <div id="app">
       <div class="shell">
-        <!-- BARRE LATÉRALE -->
-        <nav class="sidebar">
+        <!-- SIDEBAR -->
+        <nav class="sidebar" id="sidebar">
           <div class="sidebar-logo">
-            <i class="bi bi-box-seam"></i> IntelStock<span id="org-name"
-              >Plateforme de Stocks</span
+            <button
+              class="sidebar-toggle"
+              id="sidebar-toggle"
+              onclick="toggleSidebar()"
             >
+              <i class="bi bi-layout-sidebar"></i>
+            </button>
+            <span class="logo-text"
+              ><i class="bi bi-boxes"></i> IntelStock</span
+            >
+            <span id="org-name">Gestion des Stocks</span>
           </div>
           <div class="nav">
             <div class="nav-section">Principal</div>
-            <div class="nav-item active" onclick="goPage('dashboard')">
+            <div
+              class="nav-item active"
+              onclick="goPage('dashboard')"
+              data-page="dashboard"
+            >
               <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
-              Tableau de bord
+              <span class="nav-label">Tableau de bord</span>
             </div>
-            <div class="nav-item" onclick="goPage('products')">
+            <div
+              class="nav-item"
+              onclick="goPage('products')"
+              data-page="products"
+            >
               <span class="nav-icon"><i class="bi bi-box-seam"></i></span>
-              Produits
+              <span class="nav-label">Produits</span>
             </div>
-            <div class="nav-item" onclick="goPage('movements')">
+            <div
+              class="nav-item"
+              onclick="goPage('movements')"
+              data-page="movements"
+            >
               <span class="nav-icon"
                 ><i class="bi bi-arrow-left-right"></i
               ></span>
-              Mouvements
+              <span class="nav-label">Mouvements</span>
+            </div>
+            <div class="nav-section">Analyse</div>
+            <div class="nav-item" onclick="goPage('usage')" data-page="usage">
+              <span class="nav-icon"><i class="bi bi-graph-up-arrow"></i></span>
+              <span class="nav-label">Utilisation</span>
+            </div>
+            <div
+              class="nav-item"
+              onclick="goPage('reports')"
+              data-page="reports"
+            >
+              <span class="nav-icon"><i class="bi bi-bar-chart-fill"></i></span>
+              <span class="nav-label">Rapports</span>
             </div>
             <div class="nav-section">Opérations</div>
-            <div class="nav-item" onclick="goPage('alerts')">
-              <span class="nav-icon"><i class="bi bi-bell"></i></span> Alertes
+            <div class="nav-item" onclick="goPage('alerts')" data-page="alerts">
+              <span class="nav-icon"><i class="bi bi-bell-fill"></i></span>
+              <span class="nav-label">Alertes</span>
               <span class="nav-badge" id="alert-nav-count" style="display: none"
                 >0</span
               >
             </div>
-            <div class="nav-item" onclick="goPage('reports')">
-              <span class="nav-icon"><i class="bi bi-bar-chart"></i></span>
-              Rapports
-            </div>
             <div class="nav-section" id="admin-nav-section">Admin</div>
-            <div class="nav-item" id="users-nav-item" onclick="goPage('users')">
-              <span class="nav-icon"><i class="bi bi-people"></i></span>
-              Utilisateurs
+            <div
+              class="nav-item"
+              id="users-nav-item"
+              onclick="goPage('users')"
+              data-page="users"
+            >
+              <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
+              <span class="nav-label">Utilisateurs</span>
+            </div>
+            <div
+              class="nav-item"
+              id="audit-nav-item"
+              onclick="goPage('audit')"
+              data-page="audit"
+              style="display: none"
+            >
+              <span class="nav-icon"><i class="bi bi-journal-text"></i></span>
+              <span class="nav-label">Journal d'audit</span>
             </div>
           </div>
           <div class="sidebar-user">
             <div class="user-avatar" id="user-avatar">SA</div>
-            <div>
+            <div class="user-info">
               <div class="user-name" id="user-name">Chargement...</div>
               <div class="user-role" id="user-role">—</div>
             </div>
@@ -124,22 +175,23 @@
           </div>
         </nav>
 
-        <!-- CONTENU PRINCIPAL -->
+        <!-- MAIN -->
         <div class="main">
           <div class="topbar">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">
+              <i class="bi bi-list"></i>
+            </button>
             <div class="page-title" id="topbar-title">Tableau de bord</div>
             <div
               class="topbar-search"
               id="global-search-wrap"
               style="display: none"
             >
-              <span style="color: var(--subtle); font-size: 13px"
-                ><i class="bi bi-search"></i
-              ></span>
+              <i class="bi bi-search" style="color: var(--subtle)"></i>
               <input
                 type="text"
                 id="product-search"
-                placeholder="Rechercher produits, SKU..."
+                placeholder="Rechercher produits..."
                 oninput="searchProducts()"
               />
             </div>
@@ -151,6 +203,13 @@
                 align-items: center;
               "
             >
+              <div
+                class="theme-toggle"
+                onclick="toggleTheme()"
+                title="Thème sombre/clair"
+              >
+                <i class="bi bi-moon-fill" id="theme-icon"></i>
+              </div>
               <div
                 class="alert-bell"
                 onclick="goPage('alerts')"
@@ -168,35 +227,36 @@
                 id="topbar-action"
                 onclick="openAddProduct()"
               >
-                + Ajouter Produit
+                <i class="bi bi-plus-lg"></i>
+                <span id="topbar-action-label">Ajouter</span>
               </button>
             </div>
           </div>
 
           <div class="content">
-            <!-- PAGE TABLEAU DE BORD -->
+            <!-- PAGE DASHBOARD -->
             <div class="page active" id="page-dashboard">
               <div class="kpi-grid">
                 <div class="kpi-card blue">
                   <div class="kpi-label">Total Produits</div>
                   <div class="kpi-val" id="kpi-products">—</div>
-                  <div class="kpi-sub">SKU Actifs</div>
+                  <div class="kpi-sub" id="kpi-products-sub">
+                    Références actives
+                  </div>
                   <div class="kpi-icon"><i class="bi bi-list-check"></i></div>
                 </div>
                 <div class="kpi-card green">
-                  <div class="kpi-label">Valeur du Stock</div>
+                  <div class="kpi-label">Unités en Stock</div>
                   <div class="kpi-val" id="kpi-value">—</div>
-                  <div class="kpi-sub">Valeur totale inventaire</div>
-                  <div class="kpi-icon">
-                    <i class="bi bi-currency-dollar"></i>
-                  </div>
+                  <div class="kpi-sub">Total tous entrepôts</div>
+                  <div class="kpi-icon"><i class="bi bi-boxes"></i></div>
                 </div>
                 <div class="kpi-card amber">
                   <div class="kpi-label">Stock Faible</div>
                   <div class="kpi-val" id="kpi-low">—</div>
-                  <div class="kpi-sub">Nécessite attention</div>
+                  <div class="kpi-sub">Sous le seuil de réappro</div>
                   <div class="kpi-icon">
-                    <i class="bi bi-exclamation-triangle"></i>
+                    <i class="bi bi-exclamation-triangle-fill"></i>
                   </div>
                 </div>
                 <div class="kpi-card red">
@@ -204,7 +264,7 @@
                   <div class="kpi-val" id="kpi-alerts">—</div>
                   <div class="kpi-sub" id="kpi-alerts-sub">—</div>
                   <div class="kpi-icon">
-                    <i class="bi bi-lightning-charge"></i>
+                    <i class="bi bi-lightning-charge-fill"></i>
                   </div>
                 </div>
               </div>
@@ -212,20 +272,21 @@
               <div
                 style="
                   display: grid;
-                  grid-template-columns: 1fr 1fr;
+                  grid-template-columns: 1.6fr 1fr;
                   gap: 16px;
                   margin-bottom: 24px;
                 "
               >
                 <div class="table-wrap" style="padding: 18px">
-                  <div class="section-header" style="margin-bottom: 10px">
-                    <div class="section-title">Activité (7 jours)</div>
+                  <div class="section-header" style="margin-bottom: 14px">
+                    <div class="section-title">
+                      Activité — 30 derniers jours
+                    </div>
                     <span style="font-size: 11px; color: var(--muted)"
                       >Mouvements de stock</span
                     >
                   </div>
-                  <div class="trend-chart" id="trend-chart"></div>
-                  <div class="trend-labels" id="trend-labels"></div>
+                  <canvas id="trend-chart-canvas" height="80"></canvas>
                 </div>
                 <div class="table-wrap" style="padding: 18px">
                   <div class="section-header" style="margin-bottom: 14px">
@@ -234,7 +295,7 @@
                       class="btn btn-ghost btn-sm"
                       onclick="goPage('alerts')"
                     >
-                      Voir tout <i class="bi bi-arrow-right"></i>
+                      Voir tout →
                     </button>
                   </div>
                   <div id="dash-alerts-list"></div>
@@ -250,9 +311,10 @@
                     <tr>
                       <th>Type</th>
                       <th>Produit</th>
+                      <th>Entrepôt</th>
                       <th>Qté</th>
-                      <th>Référence</th>
-                      <th>Date</th>
+                      <th>Réf.</th>
+                      <th>Heure</th>
                     </tr>
                   </thead>
                   <tbody id="dash-movements"></tbody>
@@ -272,54 +334,131 @@
                       Tous
                     </div>
                   </div>
-                  <div style="margin-left: auto; display: flex; gap: 8px">
+                  <div
+                    style="
+                      margin-left: auto;
+                      display: flex;
+                      gap: 8px;
+                      align-items: center;
+                      flex-wrap: wrap;
+                    "
+                  >
                     <select
                       class="form-input"
                       style="width: auto; padding: 6px 10px"
                       id="status-filter"
                       onchange="filterStatus()"
                     >
-                      <option value="">Tous les statuts</option>
-                      <option value="critical">Critique</option>
-                      <option value="warning">Attention</option>
+                      <option value="">Tous statuts</option>
+                      <option value="critical">Rupture</option>
+                      <option value="warning">Faible</option>
                       <option value="ok">OK</option>
                     </select>
+                    <select
+                      class="form-input"
+                      style="width: auto; padding: 6px 10px"
+                      id="wh-filter"
+                      onchange="loadProducts()"
+                    >
+                      <option value="">Tous entrepôts</option>
+                    </select>
+                    <button
+                      class="btn btn-ghost btn-sm"
+                      onclick="exportCSV('products')"
+                    >
+                      <i class="bi bi-download"></i> Export CSV
+                    </button>
+                    <label class="btn btn-ghost btn-sm" style="cursor: pointer">
+                      <i class="bi bi-upload"></i> Import CSV
+                      <input
+                        type="file"
+                        accept=".csv"
+                        style="display: none"
+                        onchange="importCSV(this)"
+                      />
+                    </label>
                   </div>
                 </div>
                 <table>
                   <thead>
                     <tr>
-                      <th>SKU</th>
                       <th>Produit</th>
                       <th>Catégorie</th>
-                      <th>Stock</th>
+                      <th>Entrepôts / Stock</th>
                       <th>Statut</th>
-                      <th>Valeur</th>
+                      <th>Seuil</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody id="products-tbody"></tbody>
                 </table>
+                <div
+                  id="products-pagination"
+                  style="
+                    padding: 12px 16px;
+                    border-top: 1px solid var(--border);
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                  "
+                ></div>
               </div>
             </div>
 
             <!-- PAGE MOUVEMENTS -->
             <div class="page" id="page-movements">
-              <div class="section-header">
-                <div class="section-title">Mouvements de Stock</div>
-                <button class="btn btn-primary" onclick="openMoveModal()">
-                  + Nouveau Mouvement
-                </button>
-              </div>
               <div class="table-wrap">
+                <div class="table-toolbar" style="flex-wrap: wrap; gap: 8px">
+                  <select
+                    class="form-input"
+                    style="width: auto; padding: 6px 10px"
+                    id="mv-type-filter"
+                    onchange="loadMovements()"
+                  >
+                    <option value="">Tous types</option>
+                    <option value="receive">Réception</option>
+                    <option value="distribute">Distribution</option>
+                    <option value="writeoff">Rebut</option>
+                    <option value="adjust">Ajustement</option>
+                  </select>
+                  <input
+                    type="date"
+                    class="form-input"
+                    id="mv-from"
+                    style="width: auto"
+                    onchange="loadMovements()"
+                    title="Du"
+                  />
+                  <input
+                    type="date"
+                    class="form-input"
+                    id="mv-to"
+                    style="width: auto"
+                    onchange="loadMovements()"
+                    title="Au"
+                  />
+                  <button
+                    class="btn btn-ghost btn-sm"
+                    onclick="exportCSV('movements')"
+                  >
+                    <i class="bi bi-download"></i> Export CSV
+                  </button>
+                  <button
+                    class="btn btn-primary btn-sm"
+                    style="margin-left: auto"
+                    onclick="openMoveModal()"
+                  >
+                    <i class="bi bi-plus-lg"></i> Nouveau mouvement
+                  </button>
+                </div>
                 <table>
                   <thead>
                     <tr>
                       <th>Type</th>
                       <th>Produit</th>
-                      <th>SKU</th>
-                      <th>Quantité</th>
-                      <th>Référence</th>
+                      <th>Entrepôt</th>
+                      <th>Qté</th>
+                      <th>Réf.</th>
                       <th>Notes</th>
                       <th>Par</th>
                       <th>Date</th>
@@ -327,86 +466,253 @@
                   </thead>
                   <tbody id="movements-tbody"></tbody>
                 </table>
+                <div
+                  id="movements-pagination"
+                  style="
+                    padding: 12px 16px;
+                    border-top: 1px solid var(--border);
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                  "
+                ></div>
+              </div>
+            </div>
+
+            <!-- PAGE UTILISATION (GRAPHIQUES) -->
+            <div class="page" id="page-usage">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  margin-bottom: 20px;
+                  flex-wrap: wrap;
+                "
+              >
+                <div class="section-title">
+                  Utilisation des produits par date
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 8px;
+                    margin-left: auto;
+                    flex-wrap: wrap;
+                    align-items: center;
+                  "
+                >
+                  <select
+                    class="form-input"
+                    id="usage-days"
+                    style="width: auto; padding: 6px 10px"
+                    onchange="loadUsageCharts()"
+                  >
+                    <option value="7">7 derniers jours</option>
+                    <option value="14">14 derniers jours</option>
+                    <option value="30" selected>30 derniers jours</option>
+                    <option value="60">60 derniers jours</option>
+                  </select>
+                  <select
+                    class="form-input"
+                    id="usage-cat"
+                    style="width: auto; padding: 6px 10px"
+                    onchange="loadUsageCharts()"
+                  >
+                    <option value="">Toutes catégories</option>
+                  </select>
+                  <select
+                    class="form-input"
+                    id="usage-product"
+                    style="width: auto; padding: 6px 10px"
+                    onchange="loadUsageCharts()"
+                  >
+                    <option value="">Top 8 produits</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Chart principal: courbes par produit -->
+              <div
+                class="table-wrap"
+                style="padding: 20px; margin-bottom: 20px"
+              >
+                <div class="section-header" style="margin-bottom: 16px">
+                  <div class="section-title">Consommation journalière</div>
+                  <span style="font-size: 11px; color: var(--muted)"
+                    >Distributions + Mises au rebut</span
+                  >
+                </div>
+                <canvas id="usage-line-chart" height="100"></canvas>
+              </div>
+
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 16px;
+                  margin-bottom: 20px;
+                "
+              >
+                <!-- Bar chart: totaux -->
+                <div class="table-wrap" style="padding: 20px">
+                  <div class="section-title" style="margin-bottom: 16px">
+                    Total consommé par produit
+                  </div>
+                  <canvas id="usage-bar-chart" height="200"></canvas>
+                </div>
+                <!-- Tableau des totaux -->
+                <div class="table-wrap" style="padding: 18px">
+                  <div class="section-title" style="margin-bottom: 14px">
+                    Classement par consommation
+                  </div>
+                  <div id="usage-totals-table"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PAGE RAPPORTS -->
+            <div class="page" id="page-reports">
+              <div
+                style="
+                  display: flex;
+                  gap: 12px;
+                  margin-bottom: 16px;
+                  flex-wrap: wrap;
+                  align-items: center;
+                "
+              >
+                <div class="section-title">Rapports de Stock</div>
+                <div style="margin-left: auto; display: flex; gap: 8px">
+                  <button
+                    class="btn btn-ghost btn-sm"
+                    onclick="exportCSV('products')"
+                  >
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Export
+                    Produits
+                  </button>
+                  <button
+                    class="btn btn-ghost btn-sm"
+                    onclick="exportCSV('alerts')"
+                  >
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Export
+                    Alertes
+                  </button>
+                </div>
+              </div>
+              <div class="kpi-grid" style="margin-bottom: 20px">
+                <div class="kpi-card blue">
+                  <div class="kpi-label">En Rupture</div>
+                  <div id="rpt-zero" class="kpi-val" style="font-size: 22px">
+                    —
+                  </div>
+                  <div class="kpi-sub">Stock = 0</div>
+                </div>
+                <div class="kpi-card red">
+                  <div class="kpi-label">Stock Faible</div>
+                  <div id="rpt-low" class="kpi-val" style="font-size: 22px">
+                    —
+                  </div>
+                  <div class="kpi-sub">Sous seuil réappro</div>
+                </div>
+                <div class="kpi-card green">
+                  <div class="kpi-label">Stock OK</div>
+                  <div id="rpt-ok" class="kpi-val" style="font-size: 22px">
+                    —
+                  </div>
+                  <div class="kpi-sub">Niveau normal</div>
+                </div>
+                <div class="kpi-card amber">
+                  <div class="kpi-label">Total Références</div>
+                  <div id="rpt-total" class="kpi-val" style="font-size: 22px">
+                    —
+                  </div>
+                  <div class="kpi-sub">Produits actifs</div>
+                </div>
+              </div>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 16px;
+                  margin-bottom: 20px;
+                "
+              >
+                <div class="table-wrap" style="padding: 18px">
+                  <div class="section-title" style="margin-bottom: 14px">
+                    Stock par Catégorie
+                  </div>
+                  <canvas id="cat-doughnut" height="180"></canvas>
+                </div>
+                <div class="table-wrap" style="padding: 18px">
+                  <div class="section-title" style="margin-bottom: 14px">
+                    Top Stock par Quantité
+                  </div>
+                  <div class="bar-chart" id="cat-chart"></div>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <div
+                  style="
+                    padding: 14px 16px;
+                    border-bottom: 1px solid var(--border);
+                  "
+                >
+                  <div class="section-title">
+                    État du Stock — Tous les Produits
+                  </div>
+                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Produit</th>
+                      <th>Catégorie</th>
+                      <th>Unité</th>
+                      <th>Qté Totale</th>
+                      <th>Seuil</th>
+                      <th>Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody id="report-products-tbody"></tbody>
+                </table>
               </div>
             </div>
 
             <!-- PAGE ALERTES -->
             <div class="page" id="page-alerts">
               <div class="section-header">
-                <div class="section-title">Centre d'Alerte</div>
-                <div style="display: flex; gap: 8px">
+                <div class="section-title">Centre d'Alertes</div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap">
                   <div
                     class="filter-chip active"
                     onclick="filterAlerts('all', this)"
                   >
-                    Tous
+                    Toutes
                   </div>
                   <div
                     class="filter-chip"
                     onclick="filterAlerts('critical', this)"
                   >
-                    Critique
+                    Critiques
                   </div>
                   <div
                     class="filter-chip"
                     onclick="filterAlerts('warning', this)"
                   >
-                    Attention
+                    Avertissements
                   </div>
                   <div class="filter-chip" onclick="filterAlerts('info', this)">
                     Info
                   </div>
+                  <button
+                    class="btn btn-ghost btn-sm"
+                    onclick="exportCSV('alerts')"
+                  >
+                    <i class="bi bi-download"></i> Export
+                  </button>
                 </div>
               </div>
               <div id="alerts-list"></div>
-            </div>
-
-            <!-- PAGE RAPPORTS -->
-            <div class="page" id="page-reports">
-              <div class="kpi-grid" style="margin-bottom: 20px">
-                <div class="kpi-card blue">
-                  <div class="kpi-label">Catégorie A</div>
-                  <div id="rpt-a" class="kpi-val" style="font-size: 22px">
-                    —
-                  </div>
-                  <div class="kpi-sub">70% de la valeur du stock</div>
-                </div>
-                <div class="kpi-card green">
-                  <div class="kpi-label">Catégorie B</div>
-                  <div id="rpt-b" class="kpi-val" style="font-size: 22px">
-                    —
-                  </div>
-                  <div class="kpi-sub">20% de la valeur du stock</div>
-                </div>
-                <div class="kpi-card amber">
-                  <div class="kpi-label">Catégorie C</div>
-                  <div id="rpt-c" class="kpi-val" style="font-size: 22px">
-                    —
-                  </div>
-                  <div class="kpi-sub">10% de la valeur du stock</div>
-                </div>
-                <div class="kpi-card red">
-                  <div class="kpi-label">Stock Zéro</div>
-                  <div id="rpt-zero" class="kpi-val" style="font-size: 22px">
-                    —
-                  </div>
-                  <div class="kpi-sub">Articles en rupture</div>
-                </div>
-              </div>
-              <div class="report-grid">
-                <div class="table-wrap" style="padding: 18px">
-                  <div class="section-title" style="margin-bottom: 14px">
-                    Valeur par Catégorie
-                  </div>
-                  <div class="bar-chart" id="cat-chart"></div>
-                </div>
-                <div class="table-wrap" style="padding: 18px">
-                  <div class="section-title" style="margin-bottom: 14px">
-                    Analyse ABC — Meilleurs Articles
-                  </div>
-                  <div id="abc-table"></div>
-                </div>
-              </div>
             </div>
 
             <!-- PAGE UTILISATEURS -->
@@ -414,7 +720,7 @@
               <div class="section-header">
                 <div class="section-title">Gestion des Utilisateurs</div>
                 <button class="btn btn-primary" onclick="openAddUser()">
-                  + Inviter Utilisateur
+                  <i class="bi bi-person-plus"></i> Inviter
                 </button>
               </div>
               <div class="table-wrap">
@@ -425,12 +731,37 @@
                       <th>E-mail</th>
                       <th>Rôle</th>
                       <th>Statut</th>
-                      <th>Inscrit le</th>
-                      <th>Dernière Connexion</th>
+                      <th>Inscription</th>
+                      <th>Dernière connexion</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody id="users-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- PAGE AUDIT -->
+            <div class="page" id="page-audit">
+              <div class="section-header">
+                <div class="section-title">Journal d'Audit</div>
+                <span style="font-size: 12px; color: var(--muted)"
+                  >100 dernières actions</span
+                >
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Utilisateur</th>
+                      <th>Action</th>
+                      <th>Entité</th>
+                      <th>Détails</th>
+                      <th>IP</th>
+                    </tr>
+                  </thead>
+                  <tbody id="audit-tbody"></tbody>
                 </table>
               </div>
             </div>
@@ -439,90 +770,149 @@
       </div>
     </div>
 
-    <!-- MODALES -->
+    <!-- OVERLAY SIDEBAR MOBILE -->
+    <div
+      id="sidebar-overlay"
+      class="sidebar-overlay"
+      onclick="toggleSidebar()"
+    ></div>
+
+    <!-- MODALS ──────────────────────────────────────────────────────────────── -->
+
+    <!-- Modal Produit -->
     <div class="modal-overlay" id="product-modal">
       <div class="modal">
-        <div class="modal-title">Ajouter un Produit</div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">SKU *</label
-            ><input class="form-input" id="p-sku" placeholder="PRD-001" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Unité</label
-            ><input
-              class="form-input"
-              id="p-unit"
-              placeholder="pièces"
-              value="pièces"
-            />
-          </div>
+        <div class="modal-title" id="product-modal-title">
+          Ajouter un Produit
         </div>
+        <input type="hidden" id="p-id" />
         <div class="form-group">
-          <label class="form-label">Nom du Produit *</label
-          ><input class="form-input" id="p-name" placeholder="Nom du produit" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Catégorie</label>
-          <select class="form-input" id="p-cat"></select>
-        </div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">Point de Réapprovisionnement</label
-            ><input class="form-input" id="p-rp" type="number" value="10" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Quantité de Réapprovisionnement</label
-            ><input class="form-input" id="p-rq" type="number" value="50" />
-          </div>
+          <label class="form-label">Nom du produit *</label>
+          <input
+            class="form-input"
+            id="p-name"
+            placeholder="ex: Gilets de sécurité jaune fluo"
+          />
         </div>
         <div class="form-grid">
           <div class="form-group">
-            <label class="form-label">Coût Unitaire ($)</label
-            ><input
+            <label class="form-label">Catégorie</label>
+            <select class="form-input" id="p-cat"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Unité</label>
+            <select class="form-input" id="p-unit">
+              <option>pièce</option>
+              <option>paire</option>
+              <option>boîte</option>
+              <option>rouleau</option>
+              <option>rame</option>
+              <option>bloc</option>
+              <option>carton</option>
+              <option>lot</option>
+              <option>unité</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Seuil de réappro *</label>
+            <input
               class="form-input"
-              id="p-cost"
+              id="p-rp"
               type="number"
-              step="0.01"
-              value="0"
+              value="10"
+              min="0"
             />
           </div>
           <div class="form-group">
-            <label class="form-label">Stock Initial</label
-            ><input class="form-input" id="p-qty" type="number" value="0" />
+            <label class="form-label">Quantité de réappro</label>
+            <input
+              class="form-input"
+              id="p-rq"
+              type="number"
+              value="50"
+              min="1"
+            />
           </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stock initial (entrepôt principal)</label>
+          <input
+            class="form-input"
+            id="p-qty"
+            type="number"
+            value="0"
+            min="0"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input
+            class="form-input"
+            id="p-desc"
+            placeholder="Description optionnelle"
+          />
         </div>
         <div class="modal-footer">
           <button class="btn btn-ghost" onclick="closeModal('product-modal')">
             Annuler
           </button>
-          <button class="btn btn-primary" onclick="submitAddProduct()">
-            Ajouter Produit
+          <button class="btn btn-primary" onclick="submitProduct()">
+            Enregistrer
           </button>
         </div>
       </div>
     </div>
 
+    <!-- Modal Mouvement -->
     <div class="modal-overlay" id="move-modal">
       <div class="modal">
         <div class="modal-title">Nouveau Mouvement de Stock</div>
         <div class="form-group">
-          <label class="form-label">Type de Mouvement</label>
+          <label class="form-label">Type de mouvement</label>
           <select class="form-input" id="m-type">
-            <option value="receive">📥 Réception Stock</option>
-            <option value="transfer">📤 Transfert / Expédition</option>
-            <option value="writeoff">🗑 Mise au Rebut</option>
-            <option value="adjust">✏ Ajustement Manuel</option>
+            <option value="receive">📥 Réception</option>
+            <option value="distribute">📤 Distribution / Sortie</option>
+            <option value="writeoff">🗑 Mise au rebut</option>
+            <option value="adjust">✏ Ajustement manuel</option>
           </select>
         </div>
         <div class="form-group">
           <label class="form-label">Produit *</label>
-          <select class="form-input" id="m-product"></select>
+          <select
+            class="form-input"
+            id="m-product"
+            onchange="updateMoveStock()"
+          ></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Entrepôt</label>
+          <select class="form-input" id="m-warehouse"></select>
+        </div>
+        <div
+          id="current-stock-display"
+          style="
+            display: none;
+            margin: -8px 0 12px;
+            padding: 8px 12px;
+            background: var(--bg3);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--muted);
+          "
+        >
+          Stock actuel:
+          <span
+            id="current-stock-val"
+            style="font-weight: 600; color: var(--text)"
+            >—</span
+          >
         </div>
         <div class="form-grid">
           <div class="form-group">
-            <label class="form-label">Quantité *</label
-            ><input
+            <label class="form-label">Quantité *</label>
+            <input
               class="form-input"
               id="m-qty"
               type="number"
@@ -531,17 +921,17 @@
             />
           </div>
           <div class="form-group">
-            <label class="form-label">N° de Référence</label
-            ><input
+            <label class="form-label">Référence</label>
+            <input
               class="form-input"
               id="m-ref"
-              placeholder="BC-001, REF-123..."
+              placeholder="PO-001, BON-123..."
             />
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Notes</label
-          ><input
+          <label class="form-label">Notes</label>
+          <input
             class="form-input"
             id="m-notes"
             placeholder="Notes optionnelles"
@@ -552,17 +942,18 @@
             Annuler
           </button>
           <button class="btn btn-primary" onclick="submitMove()">
-            Enregistrer Mouvement
+            Enregistrer
           </button>
         </div>
       </div>
     </div>
 
+    <!-- Modal Utilisateur -->
     <div class="modal-overlay" id="user-modal">
       <div class="modal">
         <div class="modal-title">Inviter un Utilisateur</div>
         <div class="form-group">
-          <label class="form-label">Nom Complet *</label
+          <label class="form-label">Nom complet *</label
           ><input class="form-input" id="u-name" placeholder="Jean Dupont" />
         </div>
         <div class="form-group">
@@ -588,8 +979,8 @@
           <select class="form-input" id="u-role">
             <option value="viewer">Visionneur</option>
             <option value="operator">Opérateur</option>
-            <option value="admin">Administrateur</option>
-            <option value="superadmin">Super Administrateur</option>
+            <option value="admin">Admin</option>
+            <option value="superadmin">Super Admin</option>
           </select>
         </div>
         <div class="modal-footer">
@@ -597,7 +988,7 @@
             Annuler
           </button>
           <button class="btn btn-primary" onclick="submitAddUser()">
-            Inviter Utilisateur
+            Inviter
           </button>
         </div>
       </div>
@@ -606,15 +997,42 @@
     <div class="toast" id="toast"></div>
 
     <script>
+      // ── État global ────────────────────────────────────────────────────────────────
       let currentUser = null;
-      let allProducts = [];
-      let allAlerts = [];
-      let catFilter = 0;
-      let statusFilter = "";
-      let alertFilter = "all";
+      let allProducts = [],
+        allAlerts = [];
+      let catFilter = 0,
+        statusFilter = "",
+        alertFilter = "all";
+      let productPage = 1,
+        movPage = 1;
+      let usageLineChart = null,
+        usageBarChart = null,
+        trendChart = null,
+        catDoughnut = null;
+      let darkMode = localStorage.getItem("theme") !== "light";
 
-      // ── Authentification ──────────────────────────────────────────────────────────
+      // ── Thème ──────────────────────────────────────────────────────────────────────
+      function applyTheme() {
+        document.body.classList.toggle("light-theme", !darkMode);
+        document.getElementById("theme-icon").className = darkMode
+          ? "bi bi-moon-fill"
+          : "bi bi-sun-fill";
+      }
+      function toggleTheme() {
+        darkMode = !darkMode;
+        localStorage.setItem("theme", darkMode ? "dark" : "light");
+        applyTheme();
+        // Re-render charts
+        if (trendChart) {
+          trendChart.destroy();
+          trendChart = null;
+          loadDashboard();
+        }
+      }
+      applyTheme();
 
+      // ── Auth ──────────────────────────────────────────────────────────────────────
       async function doLogin() {
         const email = document.getElementById("login-email").value;
         const pass = document.getElementById("login-pass").value;
@@ -628,46 +1046,63 @@
           currentUser = data.user;
           showApp();
         } else {
-          document.getElementById("login-err").style.display = "block";
-          document.getElementById("login-err").textContent =
-            data.error || "Échec de connexion";
+          const err = document.getElementById("login-err");
+          err.style.display = "block";
+          err.textContent = data.error || "Identifiants invalides";
         }
       }
-
       async function doLogout() {
         await fetch("/api/auth/logout", { method: "POST" });
-        document.getElementById("app").style.display = "none";
-        document.getElementById("login-screen").style.display = "flex";
+        location.reload();
       }
 
       async function showApp() {
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("app").style.display = "block";
         document.getElementById("user-name").textContent = currentUser.name;
-        document.getElementById("user-role").textContent = currentUser.role;
+        document.getElementById("user-role").textContent = roleLabel(
+          currentUser.role,
+        );
         document.getElementById("user-avatar").textContent = currentUser.name
           .split(" ")
           .map((w) => w[0])
           .join("")
           .slice(0, 2)
           .toUpperCase();
+
         if (!["superadmin", "admin"].includes(currentUser.role)) {
           document.getElementById("admin-nav-section").style.display = "none";
           document.getElementById("users-nav-item").style.display = "none";
         }
+        if (currentUser.role === "superadmin") {
+          document.getElementById("audit-nav-item").style.display = "flex";
+        }
+        await loadCategories();
+        await loadWarehouses();
         loadDashboard();
-        loadCategories();
       }
 
-      // ── Navigation ─────────────────────────────────────────────────────────────────
+      function roleLabel(r) {
+        return (
+          {
+            superadmin: "Super Admin",
+            admin: "Administrateur",
+            operator: "Opérateur",
+            viewer: "Visionneur",
+          }[r] || r
+        );
+      }
 
+      // ── Navigation ────────────────────────────────────────────────────────────────
       const pageTitles = {
         dashboard: "Tableau de bord",
         products: "Produits",
         movements: "Mouvements de Stock",
-        alerts: "Centre d'Alerte",
-        reports: "Rapports & Analyses",
+        alerts: "Centre d'Alertes",
+        reports: "Rapports",
+        usage: "Utilisation des Produits",
         users: "Gestion des Utilisateurs",
+        audit: "Journal d'Audit",
       };
 
       function goPage(name) {
@@ -678,89 +1113,113 @@
           .querySelectorAll(".nav-item")
           .forEach((n) => n.classList.remove("active"));
         document.getElementById("page-" + name).classList.add("active");
-        document.querySelectorAll(".nav-item").forEach((n) => {
-          if (
-            n.textContent
-              .toLowerCase()
-              .includes(name.split("-")[0].toLowerCase())
-          )
-            n.classList.add("active");
-        });
+        document
+          .querySelector(`[data-page="${name}"]`)
+          ?.classList.add("active");
         document.getElementById("topbar-title").textContent =
           pageTitles[name] || name;
-        document.getElementById("global-search-wrap").style.display =
-          name === "products" ? "flex" : "none";
+
+        const search = document.getElementById("global-search-wrap");
+        search.style.display = name === "products" ? "flex" : "none";
+
         const act = document.getElementById("topbar-action");
+        const lbl = document.getElementById("topbar-action-label");
         if (name === "products") {
           act.style.display = "flex";
-          act.textContent = "+ Ajouter Produit";
+          lbl.textContent = "Ajouter Produit";
           act.onclick = openAddProduct;
         } else if (name === "movements") {
           act.style.display = "flex";
-          act.textContent = "+ Nouveau Mouvement";
+          lbl.textContent = "Nouveau Mouvement";
           act.onclick = openMoveModal;
         } else if (name === "users") {
           act.style.display = "flex";
-          act.textContent = "+ Inviter Utilisateur";
+          lbl.textContent = "Inviter";
           act.onclick = openAddUser;
         } else act.style.display = "none";
+
         if (name === "products") loadProducts();
         if (name === "movements") loadMovements();
         if (name === "alerts") loadAlerts();
         if (name === "reports") loadReports();
+        if (name === "usage") loadUsageCharts();
         if (name === "users") loadUsers();
+        if (name === "audit") loadAudit();
+
+        // Close mobile sidebar
+        if (window.innerWidth <= 768) closeSidebar();
       }
 
-      // ── Tableau de bord ───────────────────────────────────────────────────────────
+      // ── Sidebar Mobile ────────────────────────────────────────────────────────────
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("sidebar-overlay").classList.toggle("visible");
+      }
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebar-overlay").classList.remove("visible");
+      }
 
+      // ── Dashboard ─────────────────────────────────────────────────────────────────
       async function loadDashboard() {
         const d = await api("/api/dashboard");
         document.getElementById("kpi-products").textContent = d.total_products;
         document.getElementById("kpi-value").textContent =
-          "$" + d.total_value.toLocaleString();
+          d.total_stock.toLocaleString("fr-FR");
         document.getElementById("kpi-low").textContent = d.low_stock;
         document.getElementById("kpi-alerts").textContent = d.active_alerts;
         document.getElementById("kpi-alerts-sub").textContent =
-          `${d.critical} critiques · ${d.warning} attentions`;
+          `${d.critical} critiques · ${d.warning} avertissements`;
 
         if (d.active_alerts > 0) {
           document.getElementById("alert-dot").style.display = "block";
-          const badge = document.getElementById("alert-nav-count");
-          badge.style.display = "inline";
-          badge.textContent = d.active_alerts;
+          const b = document.getElementById("alert-nav-count");
+          b.style.display = "inline";
+          b.textContent = d.active_alerts;
         }
 
-        const maxCount = Math.max(...d.trend.map((t) => t.count), 1);
-        const trendEl = document.getElementById("trend-chart");
-        const labelsEl = document.getElementById("trend-labels");
-        trendEl.innerHTML = d.trend
-          .map(
-            (t) =>
-              `<div class="trend-bar" style="height:${Math.max(8, (t.count / maxCount) * 100)}%" title="${t.count} mouvements"></div>`,
-          )
-          .join("");
-        labelsEl.innerHTML = d.trend
-          .map((t) => `<div class="trend-label">${t.day}</div>`)
-          .join("");
+        // Trend chart
+        const ctx = document
+          .getElementById("trend-chart-canvas")
+          .getContext("2d");
+        if (trendChart) trendChart.destroy();
+        trendChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: d.trend.map((t) => t.day),
+            datasets: [
+              {
+                label: "Mouvements",
+                data: d.trend.map((t) => t.count),
+                backgroundColor: darkMode ? "#4f8ef755" : "#4f8ef733",
+                borderColor: "#4f8ef7",
+                borderWidth: 1.5,
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: chartOptions({
+            scales: { x: { ticks: { maxTicksLimit: 10 } } },
+          }),
+        });
 
-        const alertsEl = document.getElementById("dash-alerts-list");
+        // Critical alerts
         const alerts = await api("/api/alerts");
         allAlerts = alerts;
-        const criticals = alerts
-          .filter((a) => a.level === "critical")
-          .slice(0, 3);
-        if (criticals.length === 0) {
-          alertsEl.innerHTML =
-            '<div class="empty"><div class="empty-icon">✓</div><div class="empty-text">Aucune alerte critique</div></div>';
+        const el = document.getElementById("dash-alerts-list");
+        const crits = alerts.filter((a) => a.level === "critical").slice(0, 4);
+        if (!crits.length) {
+          el.innerHTML =
+            '<div class="empty" style="padding:30px 20px"><div class="empty-icon"><i class="bi bi-check-circle" style="font-size:28px;color:var(--green)"></i></div><div class="empty-text">Aucune alerte critique</div></div>';
         } else {
-          alertsEl.innerHTML = criticals
+          el.innerHTML = crits
             .map(
               (a) => `
-      <div class="alert-card ${a.level}" style="margin-bottom:8px">
-        <div class="alert-icon-wrap">🚨</div>
+      <div class="alert-card critical" style="margin-bottom:8px">
+        <div class="alert-icon-wrap"><i class="bi bi-exclamation-octagon-fill" style="color:var(--red)"></i></div>
         <div class="alert-content">
           <div class="alert-title">${a.product}</div>
-          <div class="alert-msg">${a.message}</div>
+          <div class="alert-msg">${a.warehouse}</div>
           <div class="alert-meta">${a.time}</div>
         </div>
       </div>`,
@@ -768,130 +1227,153 @@
             .join("");
         }
 
-        const mvEl = document.getElementById("dash-movements");
-        mvEl.innerHTML = d.recent_movements
+        // Recent movements
+        document.getElementById("dash-movements").innerHTML = d.recent_movements
           .map(
             (m) => `
-     <tr>
-       <td><span class="badge badge-${m.type}">${m.type}</span></td>
-       <td>${m.product}</td>
-      <td class="mono">×${m.qty}</td>
-      <td class="mono">${m.ref || "—"}</td>
+    <tr>
+      <td>${movTypeBadge(m.type)}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.product}</td>
+      <td style="font-size:12px;color:var(--muted)">${m.warehouse}</td>
+      <td class="mono" style="font-weight:500">×${m.qty}</td>
+      <td class="mono">${m.ref}</td>
       <td style="color:var(--muted);font-size:12px">${m.time}</td>
-     </tr>`,
+    </tr>`,
           )
           .join("");
       }
 
-      // ── Produits ──────────────────────────────────────────────────────────────────
+      // ── Produits ─────────────────────────────────────────────────────────────────
+      let allProductsList = [];
 
       async function loadProducts() {
-        const q = document.getElementById("product-search").value;
-        allProducts = await api(
-          `/api/products?q=${encodeURIComponent(q)}&cat=${catFilter}`,
+        const q = document.getElementById("product-search")?.value || "";
+        const data = await api(
+          `/api/products?q=${encodeURIComponent(q)}&cat=${catFilter}&page=${productPage}&per_page=20`,
         );
-        renderProducts();
+        allProductsList = data.products || [];
+        renderProducts(allProductsList);
+        renderPagination(
+          "products-pagination",
+          data.page,
+          Math.ceil(data.total / data.per_page),
+          (p) => {
+            productPage = p;
+            loadProducts();
+          },
+        );
       }
 
-      function renderProducts() {
-        let data = allProducts;
-        if (statusFilter) data = data.filter((p) => p.status === statusFilter);
+      function renderProducts(data) {
+        let filtered = data;
+        if (statusFilter)
+          filtered = filtered.filter((p) => p.status === statusFilter);
         const tbody = document.getElementById("products-tbody");
-        if (!data.length) {
+        if (!filtered.length) {
           tbody.innerHTML =
-            '<tr><td colspan="7"><div class="empty"><div class="empty-icon">⬚</div><div class="empty-text">Aucun produit trouvé</div></div></tr>';
+            '<tr><td colspan="6"><div class="empty"><div class="empty-icon"><i class="bi bi-box-seam" style="font-size:32px"></i></div><div class="empty-text">Aucun produit trouvé</div></div></td></tr>';
           return;
         }
-        tbody.innerHTML = data
+        const canEdit = ["superadmin", "admin", "operator"].includes(
+          currentUser.role,
+        );
+        const isAdmin = ["superadmin", "admin"].includes(currentUser.role);
+        tbody.innerHTML = filtered
           .map((p) => {
             const pct = Math.min(
               100,
-              Math.round((p.quantity / (p.reorder_point * 3)) * 100),
+              Math.round((p.quantity / (p.reorder_point * 3 || 1)) * 100),
             );
-            const fillColor =
-              p.status === "ok"
-                ? "var(--green)"
-                : p.status === "warning"
-                  ? "var(--amber)"
-                  : p.status === "low"
-                    ? "var(--purple)"
-                    : "var(--red)";
-            const qtyClass =
-              "qty-" + (p.quantity === 0 ? "critical" : p.status);
-            const canEdit = ["superadmin", "admin", "operator"].includes(
-              currentUser.role,
-            );
+            const fc = {
+              ok: "var(--green)",
+              warning: "var(--amber)",
+              low: "var(--purple)",
+              critical: "var(--red)",
+            }[p.status];
+            const qc = "qty-" + (p.quantity === 0 ? "critical" : p.status);
+            const whList = p.warehouses
+              .map(
+                (w) =>
+                  `<div style="font-size:11px;color:var(--muted)">${w.wh}: <b style="color:var(--text)">${w.qty}</b></div>`,
+              )
+              .join("");
             return `<tr>
-      <td class="mono">${p.sku}</td>
-      <td><div style="font-weight:500">${p.name}</div><div style="font-size:11px;color:var(--muted)">${p.unit}</div></td>
+      <td>
+        <div style="font-weight:500">${p.name}</div>
+        <div style="font-size:11px;color:var(--muted)">${p.unit}${p.description ? " · " + p.description.substring(0, 40) : ""}</div>
+      </td>
       <td><span class="cat-badge cat-${p.cat_color}">${p.category}</span></td>
       <td>
-        <div class="stock-indicator">
-          <span class="${qtyClass}" style="font-weight:500;font-family:var(--font-mono);min-width:30px">${p.quantity}</span>
-          <div class="stock-bar"><div class="stock-fill" style="width:${pct}%;background:${fillColor}"></div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="${qc}" style="font-weight:600;font-family:var(--font-mono);min-width:28px">${p.quantity}</span>
+          <div class="stock-bar" style="min-width:50px"><div class="stock-fill" style="width:${pct}%;background:${fc}"></div></div>
         </div>
-        <div style="font-size:10px;color:var(--subtle);margin-top:2px">Réapprovisionnement à ${p.reorder_point}</div>
+        <div style="margin-top:3px">${whList}</div>
       </td>
-      <td><span class="badge badge-${p.status}">${p.status === "critical" ? "Critique" : p.status === "warning" ? "Attention" : p.status === "low" ? "Faible" : "OK"}</span></td>
-      <td class="mono">$${p.value.toLocaleString()}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td style="font-family:var(--font-mono);font-size:12px">${p.reorder_point}</td>
       <td>
         <div class="action-row">
-          ${canEdit ? `<button class="btn btn-ghost btn-sm btn-icon" onclick="quickMove(${p.id},'${p.name}')" title="Ajouter stock">+</button>` : ""}
-          ${currentUser.role === "superadmin" ? `<button class="btn btn-danger btn-sm btn-icon" onclick="deleteProduct(${p.id})" title="Supprimer">✕</button>` : ""}
+          ${canEdit ? `<button class="btn btn-ghost btn-sm btn-icon" onclick="quickMove(${p.id})" title="Mouvement"><i class="bi bi-arrow-left-right"></i></button>` : ""}
+          ${isAdmin ? `<button class="btn btn-ghost btn-sm btn-icon" onclick="editProduct(${p.id})" title="Modifier"><i class="bi bi-pencil"></i></button>` : ""}
+          ${isAdmin ? `<button class="btn btn-danger btn-sm btn-icon" onclick="deleteProduct(${p.id})" title="Supprimer"><i class="bi bi-trash"></i></button>` : ""}
         </div>
       </td>
-     </tr>`;
+    </tr>`;
           })
           .join("");
       }
 
       function searchProducts() {
+        productPage = 1;
         loadProducts();
       }
       function filterStatus() {
         statusFilter = document.getElementById("status-filter").value;
-        renderProducts();
+        renderProducts(allProductsList);
       }
 
-      async function filterCat(catId, el) {
-        catFilter = catId;
+      async function filterCat(id, el) {
+        catFilter = id;
         document
           .querySelectorAll("#cat-filters .filter-chip")
           .forEach((c) => c.classList.remove("active"));
         el.classList.add("active");
+        productPage = 1;
         await loadProducts();
       }
 
-      async function loadCategories() {
-        const cats = await api("/api/categories");
-        const filter = document.getElementById("cat-filters");
-        cats.forEach((c) => {
-          const chip = document.createElement("div");
-          chip.className = "filter-chip";
-          chip.textContent = c.name;
-          chip.onclick = () => filterCat(c.id, chip);
-          filter.appendChild(chip);
-        });
-        const pCat = document.getElementById("p-cat");
-        pCat.innerHTML =
-          '<option value="">— Sélectionner une Catégorie —</option>' +
-          cats
-            .map((c) => `<option value="${c.id}">${c.name}</option>`)
-            .join("");
+      function editProduct(pid) {
+        const p = allProductsList.find((x) => x.id === pid);
+        if (!p) return;
+        document.getElementById("p-id").value = pid;
+        document.getElementById("p-name").value = p.name;
+        document.getElementById("p-unit").value = p.unit;
+        document.getElementById("p-rp").value = p.reorder_point;
+        document.getElementById("p-rq").value = p.reorder_qty;
+        document.getElementById("p-desc").value = p.description || "";
+        document.getElementById("p-qty").disabled = true;
+        document.getElementById("product-modal-title").textContent =
+          "Modifier le Produit";
+        const catSel = document.getElementById("p-cat");
+        for (let o of catSel.options)
+          if (o.text === p.category) {
+            o.selected = true;
+            break;
+          }
+        openModal("product-modal");
       }
 
-      async function loadProductsSelect() {
-        const products = await api("/api/products");
-        const sel = document.getElementById("m-product");
-        sel.innerHTML = products
-          .map(
-            (p) =>
-              `<option value="${p.id}">${p.name} (${p.sku}) — Stock: ${p.quantity}</option>`,
-          )
-          .join("");
+      async function deleteProduct(pid) {
+        if (!confirm("Supprimer ce produit et toutes ses données ?")) return;
+        const r = await api(`/api/products/${pid}`, "DELETE");
+        if (r.success) {
+          toast("Produit supprimé", "success");
+          loadProducts();
+        } else toast(r.error || "Erreur", "error");
       }
 
-      function quickMove(pid, name) {
+      function quickMove(pid) {
         openMoveModal();
         setTimeout(() => {
           const sel = document.getElementById("m-product");
@@ -900,44 +1382,149 @@
               o.selected = true;
               break;
             }
+          updateMoveStock();
         }, 100);
       }
 
-      async function deleteProduct(pid) {
-        if (!confirm("Supprimer ce produit et toutes ses données ?")) return;
-        await api(`/api/products/${pid}`, "DELETE");
-        toast("Produit supprimé", "success");
-        loadProducts();
-      }
-
-      // ── Mouvements ─────────────────────────────────────────────────────────────────
-
+      // ── Mouvements ────────────────────────────────────────────────────────────────
       async function loadMovements() {
-        const mvs = await api("/api/movements");
+        const mtype = document.getElementById("mv-type-filter").value;
+        const from = document.getElementById("mv-from").value;
+        const to = document.getElementById("mv-to").value;
+        const data = await api(
+          `/api/movements?page=${movPage}&per_page=30&type=${mtype}&from=${from}&to=${to}`,
+        );
         const tbody = document.getElementById("movements-tbody");
-        if (!mvs.length) {
+        if (!data.movements.length) {
           tbody.innerHTML =
-            '<tr><td colspan="8"><div class="empty"><div class="empty-icon">⇄</div><div class="empty-text">Aucun mouvement</div></div></tr>';
-          return;
+            '<tr><td colspan="8"><div class="empty"><div class="empty-icon"><i class="bi bi-arrow-left-right" style="font-size:28px"></i></div><div class="empty-text">Aucun mouvement</div></div></td></tr>';
+        } else {
+          tbody.innerHTML = data.movements
+            .map(
+              (m) => `<tr>
+      <td>${movTypeBadge(m.type)}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.product}</td>
+      <td style="font-size:12px;color:var(--muted)">${m.warehouse}</td>
+      <td class="mono" style="font-weight:500">×${m.quantity}</td>
+      <td class="mono">${m.reference || "—"}</td>
+      <td style="color:var(--muted);font-size:12px;max-width:120px">${m.notes || "—"}</td>
+      <td style="font-size:12px">${m.user}</td>
+      <td style="color:var(--muted);font-size:12px">${m.time}</td>
+    </tr>`,
+            )
+            .join("");
         }
-        tbody.innerHTML = mvs
-          .map(
-            (m) => `<tr>
-     <td><span class="badge badge-${m.type}">${m.type === "receive" ? "Réception" : m.type === "transfer" ? "Transfert" : m.type === "writeoff" ? "Mise au rebut" : "Ajustement"}</span></td>
-     <td>${m.product}</td>
-    <td class="mono">${m.sku}</td>
-    <td class="mono" style="font-weight:500">×${m.quantity}</td>
-    <td class="mono">${m.reference || "—"}</td>
-    <td style="color:var(--muted);font-size:12px">${m.notes || "—"}</td>
-    <td>${m.user}</td>
-    <td style="color:var(--muted);font-size:12px">${m.time}</td>
-   </tr>`,
-          )
-          .join("");
+        renderPagination(
+          "movements-pagination",
+          data.page,
+          Math.ceil(data.total / data.per_page),
+          (p) => {
+            movPage = p;
+            loadMovements();
+          },
+        );
       }
 
-      // ── Alertes ────────────────────────────────────────────────────────────────────
+      // ── Graphiques d'Utilisation ──────────────────────────────────────────────────
+      async function loadUsageCharts() {
+        const days = document.getElementById("usage-days").value;
+        const catId = document.getElementById("usage-cat").value;
+        const pid = document.getElementById("usage-product").value;
 
+        let url = `/api/usage/by-date?days=${days}`;
+        if (pid) url += `&product_id=${pid}`;
+        else if (catId) url += `&cat_id=${catId}`;
+
+        const data = await api(url);
+
+        // Line chart
+        const lineCtx = document
+          .getElementById("usage-line-chart")
+          .getContext("2d");
+        if (usageLineChart) usageLineChart.destroy();
+        usageLineChart = new Chart(lineCtx, {
+          type: "line",
+          data: { labels: data.labels, datasets: data.datasets },
+          options: chartOptions({
+            scales: {
+              x: { ticks: { maxTicksLimit: 15, maxRotation: 45 } },
+              y: { title: { display: true, text: "Quantité consommée" } },
+            },
+          }),
+        });
+
+        // Bar chart totaux
+        const barUrl = `/api/usage/by-product?days=${days}`;
+        const barData = await api(barUrl);
+        const barCtx = document
+          .getElementById("usage-bar-chart")
+          .getContext("2d");
+        if (usageBarChart) usageBarChart.destroy();
+        usageBarChart = new Chart(barCtx, {
+          type: "bar",
+          data: {
+            labels: barData.map((d) =>
+              d.name.length > 22 ? d.name.slice(0, 22) + "…" : d.name,
+            ),
+            datasets: [
+              {
+                label: "Qté consommée",
+                data: barData.map((d) => d.total),
+                backgroundColor: [
+                  "#4f8ef7",
+                  "#3fcf7a",
+                  "#f5a623",
+                  "#ef4444",
+                  "#a78bfa",
+                  "#2dd4bf",
+                  "#fb7185",
+                  "#f97316",
+                  "#06b6d4",
+                  "#8b5cf6",
+                  "#10b981",
+                  "#f59e0b",
+                  "#6366f1",
+                  "#ec4899",
+                  "#14b8a6",
+                ].slice(0, barData.length),
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: chartOptions({
+            indexAxis: "y",
+            scales: { x: { title: { display: true, text: "Quantité" } } },
+          }),
+        });
+
+        // Totals table
+        const totEl = document.getElementById("usage-totals-table");
+        if (!data.totals.length) {
+          totEl.innerHTML =
+            '<div class="empty" style="padding:30px"><div class="empty-icon"><i class="bi bi-graph-up" style="font-size:28px"></i></div><div class="empty-text">Aucune donnée</div></div>';
+        } else {
+          const max = Math.max(...data.totals.map((t) => t.total), 1);
+          totEl.innerHTML = `<table style="width:100%">
+      <thead><tr><th>Produit</th><th>Consommé</th><th style="width:30%">Part</th></tr></thead>
+      <tbody>${data.totals
+        .map(
+          (t) => `<tr>
+        <td style="font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.name}</td>
+        <td class="mono" style="font-weight:500">${t.total}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="bar-outer" style="height:10px"><div class="bar-inner" style="width:${(t.total / max) * 100}%;background:${t.color}"></div></div>
+            <span style="font-size:10px;color:var(--muted)">${Math.round((t.total / data.totals.reduce((a, x) => a + x.total, 0)) * 100)}%</span>
+          </div>
+        </td>
+      </tr>`,
+        )
+        .join("")}</tbody>
+    </table>`;
+        }
+      }
+
+      // ── Alertes ───────────────────────────────────────────────────────────────────
       async function loadAlerts() {
         allAlerts = await api("/api/alerts");
         renderAlerts();
@@ -951,31 +1538,40 @@
         const el = document.getElementById("alerts-list");
         if (!filtered.length) {
           el.innerHTML =
-            '<div class="empty"><div class="empty-icon">✓</div><div class="empty-text">Aucune alerte</div><div class="empty-sub">Tous les niveaux de stock sont sains</div></div>';
+            '<div class="empty"><div class="empty-icon"><i class="bi bi-check-circle" style="font-size:40px;color:var(--green)"></i></div><div class="empty-text">Aucune alerte active</div><div class="empty-sub">Tous les stocks sont à niveau</div></div>';
           return;
         }
-        const icons = { critical: "🚨", warning: "⚠️", info: "ℹ️" };
+        const icons = {
+          critical: "bi-exclamation-octagon-fill",
+          warning: "bi-exclamation-triangle-fill",
+          info: "bi-info-circle-fill",
+        };
+        const icols = {
+          critical: "var(--red)",
+          warning: "var(--amber)",
+          info: "var(--accent)",
+        };
         el.innerHTML = filtered
           .map(
             (a) => `
     <div class="alert-card ${a.level}" id="alert-${a.id}">
-      <div class="alert-icon-wrap">${icons[a.level] || "🔔"}</div>
+      <div class="alert-icon-wrap"><i class="bi ${icons[a.level]}" style="color:${icols[a.level]}"></i></div>
       <div class="alert-content">
         <div class="alert-title">${a.product}</div>
         <div class="alert-msg">${a.message}</div>
-        <div class="alert-meta">${a.time} · ${a.quantity} unités restantes</div>
+        <div class="alert-meta">${a.warehouse} · ${a.time} · ${a.quantity} unités restantes</div>
       </div>
       <div class="alert-actions">
-        <button class="btn btn-ghost btn-sm" onclick="resolveAlert(${a.id})">Résoudre</button>
-        <button class="btn btn-primary btn-sm" onclick="openMoveModal()">+ Stock</button>
+        <button class="btn btn-ghost btn-sm" onclick="resolveAlert(${a.id})"><i class="bi bi-check"></i> Résoudre</button>
+        <button class="btn btn-primary btn-sm" onclick="quickReceive(${a.id})"><i class="bi bi-plus"></i> Réappro</button>
       </div>
     </div>`,
           )
           .join("");
       }
 
-      function filterAlerts(level, el) {
-        alertFilter = level;
+      function filterAlerts(l, el) {
+        alertFilter = l;
         document
           .querySelectorAll("#page-alerts .filter-chip")
           .forEach((c) => c.classList.remove("active"));
@@ -987,88 +1583,146 @@
         await api(`/api/alerts/${id}/resolve`, "POST");
         toast("Alerte résolue", "success");
         loadAlerts();
+        loadDashboard();
       }
 
-      // ── Rapports ───────────────────────────────────────────────────────────────────
+      async function quickReceive(alertId) {
+        const a = allAlerts.find((x) => x.id === alertId);
+        if (!a) return;
+        openMoveModal();
+        setTimeout(async () => {
+          const sel = document.getElementById("m-product");
+          const products = await api("/api/products");
+          const p = products.products.find((x) => x.name === a.product);
+          if (p) {
+            for (let o of sel.options)
+              if (o.value == p.id) {
+                o.selected = true;
+                break;
+              }
+          }
+          document.getElementById("m-type").value = "receive";
+          updateMoveStock();
+        }, 150);
+      }
 
+      // ── Rapports ──────────────────────────────────────────────────────────────────
       async function loadReports() {
         const data = await api("/api/reports/summary");
-        const abc = data.abc;
-        const aCount = abc.filter((x) => x.abc === "A").length;
-        const bCount = abc.filter((x) => x.abc === "B").length;
-        const cCount = abc.filter((x) => x.abc === "C").length;
-        document.getElementById("rpt-a").textContent = aCount;
-        document.getElementById("rpt-b").textContent = bCount;
-        document.getElementById("rpt-c").textContent = cCount;
-        const allProds = await api("/api/products");
-        document.getElementById("rpt-zero").textContent = allProds.filter(
-          (p) => p.quantity === 0,
-        ).length;
+        const tops = data.top_stock || [];
 
+        const zero = tops.filter((x) => x.status === "critical").length;
+        const low = tops.filter((x) => x.status === "warning").length;
+        const ok = tops.filter((x) => x.status === "ok").length;
+        const total = tops.length;
+        document.getElementById("rpt-zero").textContent = zero;
+        document.getElementById("rpt-low").textContent = low;
+        document.getElementById("rpt-ok").textContent = ok;
+        document.getElementById("rpt-total").textContent = total;
+
+        // Doughnut par catégorie
         const cats = data.by_category;
-        const maxVal = Math.max(...Object.values(cats).map((c) => c.value), 1);
-        const colors = ["#4f8ef7", "#a78bfa", "#3fcf7a", "#f5a623", "#2dd4bf"];
-        document.getElementById("cat-chart").innerHTML = Object.entries(cats)
+        const catNames = Object.keys(cats);
+        const catQtys = catNames.map((n) => cats[n].quantity);
+        const catColors = [
+          "#4f8ef7",
+          "#3fcf7a",
+          "#f5a623",
+          "#ef4444",
+          "#a78bfa",
+          "#2dd4bf",
+        ];
+        const dCtx = document.getElementById("cat-doughnut").getContext("2d");
+        if (catDoughnut) catDoughnut.destroy();
+        catDoughnut = new Chart(dCtx, {
+          type: "doughnut",
+          data: {
+            labels: catNames,
+            datasets: [
+              {
+                data: catQtys,
+                backgroundColor: catColors,
+                borderWidth: 2,
+                borderColor: darkMode ? "#0f1520" : "#ffffff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "right",
+                labels: {
+                  color: darkMode ? "#8a94a8" : "#444",
+                  font: { size: 12 },
+                },
+              },
+            },
+          },
+        });
+
+        // Bar chart top stock
+        const maxQty = Math.max(...tops.slice(0, 15).map((x) => x.qty), 1);
+        document.getElementById("cat-chart").innerHTML = tops
+          .slice(0, 15)
           .map(
-            ([name, d], i) => `
+            (p, i) => `
     <div class="bar-row">
-      <div class="bar-name">${name}</div>
-      <div class="bar-outer"><div class="bar-inner" style="width:${(d.value / maxVal) * 100}%;background:${colors[i % colors.length]}"></div></div>
-      <div class="bar-val">$${d.value.toFixed(0)}</div>
+      <div class="bar-name">${p.name}</div>
+      <div class="bar-outer"><div class="bar-inner" style="width:${(p.qty / maxQty) * 100}%;background:${catColors[i % catColors.length]}"></div></div>
+      <div class="bar-val">${p.qty}</div>
     </div>`,
           )
           .join("");
 
-        const abcColors = {
-          A: "var(--green)",
-          B: "var(--amber)",
-          C: "var(--red)",
-        };
-        document.getElementById("abc-table").innerHTML = `
-    <table style="width:100%">
-      <thead><tr><th>Produit</th><th>Valeur</th><th>Classe</th> </thead>
-      <tbody>${abc
-        .slice(0, 12)
-        .map(
-          (x) => `</td>
-        <td style="font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.name}</td>
-        <td class="mono">$${x.value}</td>
-        <td><span style="font-weight:600;color:${abcColors[x.abc]}">${x.abc}</span></td>
-      </tr>`,
-        )
-        .join("")}</tbody>
-     </table>`;
+        // Table complète
+        document.getElementById("report-products-tbody").innerHTML = tops
+          .map(
+            (p) => `
+    <tr>
+      <td>${p.name}</td>
+      <td style="font-size:12px;color:var(--muted)">—</td>
+      <td>—</td>
+      <td class="mono" style="font-weight:500">${p.qty}</td>
+      <td>—</td>
+      <td>${statusBadge(p.status)}</td>
+    </tr>`,
+          )
+          .join("");
       }
 
-      // ── Utilisateurs ───────────────────────────────────────────────────────────────
-
+      // ── Utilisateurs ──────────────────────────────────────────────────────────────
       async function loadUsers() {
         const users = await api("/api/users");
-        const tbody = document.getElementById("users-tbody");
-        tbody.innerHTML = users
+        if (users.error) {
+          toast(users.error, "error");
+          return;
+        }
+        document.getElementById("users-tbody").innerHTML = users
           .map(
-            (u) => ` <tr>
+            (u) => `
+    <tr>
       <td><div style="display:flex;align-items:center;gap:8px">
-      <div style="width:28px;height:28px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff">
-        ${u.name
-          .split(" ")
-          .map((w) => w[0])
-          .join("")
-          .slice(0, 2)
-          .toUpperCase()}
-      </div>
-      <span style="font-weight:500">${u.name}</span>
-    </div></td>
-    <td class="mono" style="font-size:12px">${u.email}</td>
-    <td><span class="badge badge-${u.role}">${u.role === "superadmin" ? "Super Admin" : u.role === "admin" ? "Admin" : u.role === "operator" ? "Opérateur" : "Visionneur"}</span></td>
-    <td><span style="color:${u.active ? "var(--green)" : "var(--red)"}">⬤</span> ${u.active ? "Actif" : "Inactif"}</td>
-    <td style="color:var(--muted);font-size:12px">${u.created_at}</td>
-    <td style="color:var(--muted);font-size:12px">${u.last_login}</td>
-    <td>${
-      u.id !== currentUser.id && currentUser.role === "superadmin"
-        ? `<button class="btn btn-ghost btn-sm" onclick="toggleUser(${u.id})">${u.active ? "Désactiver" : "Activer"}</button>`
-        : "—"
-    }</td>
+        <div style="width:28px;height:28px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff">
+          ${u.name
+            .split(" ")
+            .map((w) => w[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase()}
+        </div>
+        <span style="font-weight:500">${u.name}</span>
+      </div></td>
+      <td class="mono" style="font-size:12px">${u.email}</td>
+      <td><span class="badge badge-${u.role}">${roleLabel(u.role)}</span></td>
+      <td><span style="color:${u.active ? "var(--green)" : "var(--red)"}">⬤</span> ${u.active ? "Actif" : "Inactif"}</td>
+      <td style="color:var(--muted);font-size:12px">${u.created_at}</td>
+      <td style="color:var(--muted);font-size:12px">${u.last_login}</td>
+      <td>${
+        u.id !== currentUser.id && currentUser.role === "superadmin"
+          ? `<button class="btn btn-ghost btn-sm" onclick="toggleUser(${u.id})">${u.active ? "Désactiver" : "Activer"}</button>`
+          : "—"
+      }</td>
     </tr>`,
           )
           .join("");
@@ -1076,25 +1730,140 @@
 
       async function toggleUser(id) {
         await api(`/api/users/${id}/toggle`, "POST");
-        toast("Statut utilisateur mis à jour", "success");
+        toast("Statut mis à jour", "success");
         loadUsers();
       }
 
-      // ── Modales ───────────────────────────────────────────────────────────────────
+      // ── Audit ─────────────────────────────────────────────────────────────────────
+      async function loadAudit() {
+        const logs = await api("/api/audit");
+        if (logs.error) {
+          toast(logs.error, "error");
+          return;
+        }
+        document.getElementById("audit-tbody").innerHTML = logs
+          .map(
+            (l) => `
+    <tr>
+      <td style="font-size:12px;color:var(--muted)">${l.time}</td>
+      <td style="font-size:12px">${l.user}</td>
+      <td class="mono" style="font-size:12px">${l.action}</td>
+      <td style="font-size:12px;color:var(--muted)">${l.entity_type}</td>
+      <td style="font-size:12px;color:var(--muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.details}</td>
+      <td class="mono" style="font-size:11px;color:var(--subtle)">${l.ip}</td>
+    </tr>`,
+          )
+          .join("");
+      }
 
-      function openAddProduct() {
-        document.getElementById("product-modal").classList.add("open");
+      // ── Entrepôts & Catégories ────────────────────────────────────────────────────
+      let warehouses = [],
+        categories = [];
+
+      async function loadWarehouses() {
+        warehouses = await api("/api/warehouses");
+        const whSel = document.getElementById("m-warehouse");
+        whSel.innerHTML = warehouses
+          .map((w) => `<option value="${w.id}">${w.name}</option>`)
+          .join("");
+        const whFilter = document.getElementById("wh-filter");
+        whFilter.innerHTML =
+          '<option value="">Tous entrepôts</option>' +
+          warehouses
+            .map((w) => `<option value="${w.id}">${w.name}</option>`)
+            .join("");
       }
-      async function openMoveModal() {
-        await loadProductsSelect();
-        document.getElementById("move-modal").classList.add("open");
-        goPage("movements");
+
+      async function loadCategories() {
+        categories = await api("/api/categories");
+        const chips = document.getElementById("cat-filters");
+        chips.innerHTML =
+          '<div class="filter-chip active" onclick="filterCat(0,this)">Tous</div>';
+        categories.forEach((c) => {
+          const chip = Object.assign(document.createElement("div"), {
+            className: "filter-chip",
+            textContent: c.name,
+          });
+          chip.onclick = () => filterCat(c.id, chip);
+          chips.appendChild(chip);
+        });
+        const sel = document.getElementById("p-cat");
+        sel.innerHTML =
+          '<option value="">— Catégorie —</option>' +
+          categories
+            .map((c) => `<option value="${c.id}">${c.name}</option>`)
+            .join("");
+
+        // Usage category filter
+        const uCat = document.getElementById("usage-cat");
+        uCat.innerHTML =
+          '<option value="">Toutes catégories</option>' +
+          categories
+            .map((c) => `<option value="${c.id}">${c.name}</option>`)
+            .join("");
       }
-      function openAddUser() {
-        document.getElementById("user-modal").classList.add("open");
+
+      async function loadProductsSelect() {
+        const data = await api("/api/products?per_page=200");
+        const sel = document.getElementById("m-product");
+        sel.innerHTML = (data.products || [])
+          .map(
+            (p) =>
+              `<option value="${p.id}">${p.name} [${p.quantity} ${p.unit}]</option>`,
+          )
+          .join("");
+
+        // Usage product filter
+        const upSel = document.getElementById("usage-product");
+        upSel.innerHTML =
+          '<option value="">Top 8 produits</option>' +
+          (data.products || [])
+            .map((p) => `<option value="${p.id}">${p.name}</option>`)
+            .join("");
+      }
+
+      async function updateMoveStock() {
+        const pid = document.getElementById("m-product").value;
+        const whId = document.getElementById("m-warehouse").value;
+        if (!pid || !whId) return;
+        const data = await api(`/api/products?page=1&per_page=200`);
+        const p = (data.products || []).find((x) => x.id == pid);
+        if (p) {
+          const wh = p.warehouses.find((w) => {
+            const whr = warehouses.find((x) => x.id == whId);
+            return whr && w.wh === whr.name;
+          });
+          const qty = wh ? wh.qty : p.quantity;
+          document.getElementById("current-stock-val").textContent =
+            qty + " " + p.unit;
+          document.getElementById("current-stock-display").style.display =
+            "block";
+        }
+      }
+
+      // ── Modals ────────────────────────────────────────────────────────────────────
+      function openModal(id) {
+        document.getElementById(id).classList.add("open");
       }
       function closeModal(id) {
         document.getElementById(id).classList.remove("open");
+        if (id === "product-modal") {
+          document.getElementById("p-id").value = "";
+          document.getElementById("p-qty").disabled = false;
+          document.getElementById("product-modal-title").textContent =
+            "Ajouter un Produit";
+        }
+      }
+
+      function openAddProduct() {
+        openModal("product-modal");
+      }
+      async function openMoveModal() {
+        await loadProductsSelect();
+        openModal("move-modal");
+      }
+      function openAddUser() {
+        openModal("user-modal");
       }
 
       document.addEventListener("keydown", (e) => {
@@ -1103,59 +1872,62 @@
             .querySelectorAll(".modal-overlay.open")
             .forEach((m) => m.classList.remove("open"));
       });
-      document.querySelectorAll &&
-        document.addEventListener("DOMContentLoaded", () => {
-          document.querySelectorAll(".modal-overlay").forEach((m) =>
-            m.addEventListener("click", (e) => {
-              if (e.target === m) m.classList.remove("open");
-            }),
-          );
+      window.addEventListener("click", (e) => {
+        document.querySelectorAll(".modal-overlay.open").forEach((m) => {
+          if (e.target === m) m.classList.remove("open");
         });
+      });
 
-      async function submitAddProduct() {
+      async function submitProduct() {
+        const pid = document.getElementById("p-id").value;
         const data = {
-          sku: document.getElementById("p-sku").value,
-          name: document.getElementById("p-name").value,
+          name: document.getElementById("p-name").value.trim(),
           category_id: document.getElementById("p-cat").value,
           unit: document.getElementById("p-unit").value,
           reorder_point: document.getElementById("p-rp").value,
           reorder_qty: document.getElementById("p-rq").value,
-          unit_cost: document.getElementById("p-cost").value,
           initial_qty: document.getElementById("p-qty").value,
+          description: document.getElementById("p-desc").value,
         };
-        if (!data.sku || !data.name) {
-          toast("SKU et Nom sont requis", "error");
+        if (!data.name) {
+          toast("Le nom est requis", "error");
           return;
         }
-        const res = await api("/api/products", "POST", data);
-        if (res.success) {
+        const r = pid
+          ? await api(`/api/products/${pid}`, "PUT", data)
+          : await api("/api/products", "POST", data);
+        if (r.success) {
           closeModal("product-modal");
-          toast("Produit ajouté !", "success");
+          toast(pid ? "Produit mis à jour" : "Produit ajouté", "success");
           loadProducts();
-        } else toast(res.error || "Échec", "error");
+        } else toast(r.error || "Erreur", "error");
       }
 
       async function submitMove() {
         const data = {
           type: document.getElementById("m-type").value,
           product_id: document.getElementById("m-product").value,
+          warehouse_id: document.getElementById("m-warehouse").value,
           quantity: document.getElementById("m-qty").value,
           reference: document.getElementById("m-ref").value,
           notes: document.getElementById("m-notes").value,
         };
         if (!data.product_id || !data.quantity) {
-          toast("Sélectionnez un produit et une quantité", "error");
+          toast("Sélectionnez produit et quantité", "error");
           return;
         }
-        const res = await api("/api/stock/move", "POST", data);
-        if (res.success) {
+        const r = await api("/api/stock/move", "POST", data);
+        if (r.success) {
           closeModal("move-modal");
-          toast(
-            `Mouvement enregistré. Nouveau stock: ${res.new_qty}`,
-            "success",
-          );
+          toast(`Mouvement enregistré. Stock: ${r.new_qty}`, "success");
           loadMovements();
-        } else toast(res.error || "Échec", "error");
+          if (
+            document
+              .getElementById("page-dashboard")
+              .classList.contains("active")
+          )
+            loadDashboard();
+        } else toast(r.error || "Erreur", "error");
       }
 
       async function submitAddUser() {
@@ -1169,15 +1941,109 @@
           toast("Tous les champs sont requis", "error");
           return;
         }
-        const res = await api("/api/users", "POST", data);
-        if (res.success) {
+        const r = await api("/api/users", "POST", data);
+        if (r.success) {
           closeModal("user-modal");
-          toast("Utilisateur invité !", "success");
+          toast("Utilisateur invité", "success");
           loadUsers();
-        } else toast(res.error || "Échec", "error");
+        } else toast(r.error || "Erreur", "error");
       }
 
-      // ── Utilitaires ───────────────────────────────────────────────────────────────
+      // ── Export ────────────────────────────────────────────────────────────────────
+      function exportCSV(type) {
+        const days = type === "movements" ? "&days=30" : "";
+        window.location.href = `/api/export/${type}${days ? "?" + days : ""}`;
+      }
+
+      async function importCSV(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const form = new FormData();
+        form.append("file", file);
+        const r = await fetch("/api/products/import", {
+          method: "POST",
+          body: form,
+        }).then((x) => x.json());
+        if (r.success) {
+          toast(`${r.added} produits importés`, "success");
+          loadProducts();
+        } else toast(r.error || "Erreur import", "error");
+        input.value = "";
+      }
+
+      // ── Helpers UI ────────────────────────────────────────────────────────────────
+      function movTypeBadge(t) {
+        const cfg = {
+          receive: ["bi-box-arrow-in-down", "var(--green)", "Réception"],
+          distribute: ["bi-box-arrow-up", "var(--accent)", "Distribution"],
+          transfer: ["bi-arrow-left-right", "var(--purple)", "Transfert"],
+          writeoff: ["bi-trash", "var(--red)", "Rebut"],
+          adjust: ["bi-pencil", "var(--amber)", "Ajustement"],
+        };
+        const [icon, color, label] = cfg[t] || ["bi-circle", "var(--muted)", t];
+        return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:${color}"><i class="bi ${icon}"></i>${label}</span>`;
+      }
+
+      function statusBadge(s) {
+        const cfg = {
+          ok: ["badge-ok", "OK"],
+          warning: ["badge-warning", "Faible"],
+          low: ["badge-low", "Bas"],
+          critical: ["badge-critical", "Rupture"],
+        };
+        const [cls, lbl] = cfg[s] || ["badge-ok", s];
+        return `<span class="badge ${cls}">${lbl}</span>`;
+      }
+
+      function renderPagination(containerId, page, totalPages, onPage) {
+        const el = document.getElementById(containerId);
+        if (totalPages <= 1) {
+          el.innerHTML = "";
+          return;
+        }
+        let html = `<span style="font-size:12px;color:var(--muted)">Page ${page}/${totalPages}</span>`;
+        if (page > 1)
+          html += `<button class="btn btn-ghost btn-sm" onclick="(${onPage})(${page - 1})"><i class="bi bi-chevron-left"></i></button>`;
+        if (page < totalPages)
+          html += `<button class="btn btn-ghost btn-sm" onclick="(${onPage})(${page + 1})"><i class="bi bi-chevron-right"></i></button>`;
+        el.innerHTML = html;
+      }
+
+      function chartOptions(extra = {}) {
+        const base = {
+          responsive: true,
+          animation: { duration: 400 },
+          plugins: {
+            legend: {
+              labels: {
+                color: darkMode ? "#8a94a8" : "#555",
+                font: { size: 11 },
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { color: darkMode ? "#253047" : "#e5e7eb" },
+              ticks: { color: darkMode ? "#8a94a8" : "#555" },
+            },
+            y: {
+              grid: { color: darkMode ? "#253047" : "#e5e7eb" },
+              ticks: { color: darkMode ? "#8a94a8" : "#555" },
+            },
+          },
+        };
+        return deepMerge(base, extra);
+      }
+
+      function deepMerge(a, b) {
+        const r = { ...a };
+        for (const k in b) {
+          if (b[k] && typeof b[k] === "object" && !Array.isArray(b[k]))
+            r[k] = deepMerge(a[k] || {}, b[k]);
+          else r[k] = b[k];
+        }
+        return r;
+      }
 
       async function api(url, method = "GET", body = null) {
         const opts = {
@@ -1191,26 +2057,33 @@
 
       function toast(msg, type = "success") {
         const t = document.getElementById("toast");
-        t.textContent = (type === "success" ? "✓ " : "✕ ") + msg;
+        t.innerHTML =
+          (type === "success"
+            ? '<i class="bi bi-check-circle-fill" style="color:var(--green)"></i> '
+            : '<i class="bi bi-x-circle-fill" style="color:var(--red)"></i> ') +
+          msg;
         t.className = `toast ${type} show`;
-        setTimeout(() => t.classList.remove("show"), 3000);
+        setTimeout(() => t.classList.remove("show"), 3500);
       }
 
-      // ── Initialisation ───────────────────────────────────────────────────────────
-
+      // ── Init ───────────────────────────────────────────────────────────────────────
       (async () => {
-        const me = await fetch("/api/auth/me").then((r) => r.json());
+        const me = await fetch("/api/auth/me")
+          .then((r) => r.json())
+          .catch(() => ({}));
         if (me.id) {
           currentUser = me;
           showApp();
         } else {
           document.getElementById("login-screen").style.display = "flex";
-          document
-            .getElementById("login-email")
-            .addEventListener("keydown", (e) => e.key === "Enter" && doLogin());
-          document
-            .getElementById("login-pass")
-            .addEventListener("keydown", (e) => e.key === "Enter" && doLogin());
+          ["login-email", "login-pass"].forEach((id) => {
+            document
+              .getElementById(id)
+              .addEventListener(
+                "keydown",
+                (e) => e.key === "Enter" && doLogin(),
+              );
+          });
         }
       })();
     </script>
